@@ -1,0 +1,88 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">
+<head>
+<meta charset="utf-8">
+<title>Bookshelf Test Checklist</title>
+<style>
+  body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; color: #222; }
+  h1 { font-size: 18pt; margin-bottom: 2px; }
+  h2 { font-size: 13pt; margin-top: 18px; border-bottom: 1px solid #ccc; padding-bottom: 2px; }
+  p.sub { color: #666; margin-top: 0; }
+  table { border-collapse: collapse; width: 100%; margin-top: 6px; }
+  th, td { border: 1px solid #999; padding: 5px 7px; text-align: left; vertical-align: top; font-size: 10.5pt; }
+  th { background: #f0f0f0; }
+  .res { width: 70px; }
+  .note { width: 200px; }
+  .tip { color: #666; font-size: 10pt; }
+</style>
+</head>
+<body>
+
+<h1>Bookshelf — Test Checklist</h1>
+<p class="sub">Just try each step in your browser at <b>http://localhost:3000</b> and put a tick or a cross in "OK?". Add a note if anything's broken, confusing, or ugly.</p>
+
+<p>
+Your name: ______________________  &nbsp;&nbsp; Date: ____________ &nbsp;&nbsp; Phone or computer? ____________
+</p>
+<p class="tip">Tip: a couple of tests need a 2nd account — sign up again using <b>youremail+test@gmail.com</b> (same inbox, separate account).</p>
+
+<h2>1. Account</h2>
+<table>
+<tr><th>Step</th><th>Should happen</th><th class="res">OK?</th><th class="note">Notes</th></tr>
+<tr><td>Sign up (Log in or sign up → Create an account), then click the link in the confirmation email.</td><td>You end up logged in.</td><td></td><td></td></tr>
+<tr><td>Log out, then log back in.</td><td>Works with your email + password.</td><td></td><td></td></tr>
+</table>
+<p class="tip">Emails can be slow / land in spam, and there's an hourly limit — if none arrives, wait and retry.</p>
+
+<h2>2. Your profile</h2>
+<table>
+<tr><th>Step</th><th>Should happen</th><th class="res">OK?</th><th class="note">Notes</th></tr>
+<tr><td>My profile → add a display name, bio, a banner image link, pick an accent colour → Save.</td><td>Saves with a green message.</td><td></td><td></td></tr>
+<tr><td>Open your public page (the /u/your-name link at the top).</td><td>Banner + accent colour + your details show.</td><td></td><td></td></tr>
+</table>
+
+<h2>3. Logging things</h2>
+<table>
+<tr><th>Step</th><th>Should happen</th><th class="res">OK?</th><th class="note">Notes</th></tr>
+<tr><td>Books → search a book → Log this book → pick a status + star rating + review → Save.</td><td>It appears on "My shelf".</td><td></td><td></td></tr>
+<tr><td>Do the same for a Film and one other type (TV / Music / Games / Art).</td><td>All search and log; each type is a different colour.</td><td></td><td></td></tr>
+<tr><td>My shelf → click an item → change the rating → save again.</td><td>Updates it (no duplicate).</td><td></td><td></td></tr>
+<tr><td>Open Timeline.</td><td>Shows everything you logged, newest first, with stars/reviews.</td><td></td><td></td></tr>
+</table>
+
+<h2>4. Lists &amp; Discover</h2>
+<table>
+<tr><th>Step</th><th>Should happen</th><th class="res">OK?</th><th class="note">Notes</th></tr>
+<tr><td>Lists → create a list. Then open an item → "Add to a list" → pick it.</td><td>The item shows up in the list.</td><td></td><td></td></tr>
+<tr><td>Discover → search the name of something you logged, and search a username.</td><td>Finds matching media and people.</td><td></td><td></td></tr>
+</table>
+
+<h2>5. Following &amp; social (needs a 2nd account)</h2>
+<table>
+<tr><th>Step</th><th>Should happen</th><th class="res">OK?</th><th class="note">Notes</th></tr>
+<tr><td>Make a 2nd account (B) and log a few things on it.</td><td>Saves to B's shelf.</td><td></td><td></td></tr>
+<tr><td>On your main account (A): Discover → open account B → Follow.</td><td>Button changes to "Following".</td><td></td><td></td></tr>
+<tr><td>Account A: open Feed.</td><td>B's items appear.</td><td></td><td></td></tr>
+<tr><td>In the feed, open one of B's items → Like it → add a comment.</td><td>Like + comment register.</td><td></td><td></td></tr>
+<tr><td>Log in as B → open Notifications.</td><td>Shows A followed / liked / commented.</td><td></td><td></td></tr>
+</table>
+
+<h2>6. Recommendations</h2>
+<table>
+<tr><th>Step</th><th>Should happen</th><th class="res">OK?</th><th class="note">Notes</th></tr>
+<tr><td>After rating several things 4★+, open "For you".</td><td>Shows suggestions (or asks you to rate more).</td><td></td><td></td></tr>
+</table>
+
+<h2>What did you think?</h2>
+<table>
+<tr><th>Question</th><th>Your answer</th></tr>
+<tr><td>Best bit?</td><td></td></tr>
+<tr><td>Anything confusing or annoying?</td><td></td></tr>
+<tr><td>Anything broken or ugly? (which page?)</td><td></td></tr>
+<tr><td>Did it work OK on a phone?</td><td></td></tr>
+<tr><td>Would you use it?</td><td></td></tr>
+</table>
+
+<p style="margin-top:16px;">Thanks! 🎉</p>
+
+</body>
+</html>
