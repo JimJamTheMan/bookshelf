@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { starsFromRating } from "@/lib/stars";
 import { statusLabel } from "@/lib/status";
+import { displayTitle } from "@/lib/format";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A",
@@ -156,8 +157,17 @@ export default async function ShelfPage({
                     </div>
                   </Link>
                   <p className="mt-2 line-clamp-2 text-sm font-medium leading-tight">
-                    {row.media.title}
+                    {displayTitle(
+                      row.media.title,
+                      row.media.release_year,
+                      row.media.media_type,
+                    )}
                   </p>
+                  {row.media.creator && (
+                    <p className="line-clamp-1 text-xs text-white/40">
+                      {row.media.creator}
+                    </p>
+                  )}
                   <p className="text-xs text-white/50">
                     {statusLabel(row.media.media_type, row.status)}
                     {row.rating ? ` · ${starsFromRating(row.rating)}` : ""}

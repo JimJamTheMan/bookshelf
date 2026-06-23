@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Cover } from "../_components/Cover";
 import { starsFromRating } from "@/lib/stars";
+import { displayTitle } from "@/lib/format";
 
 const STATUS_VERB: Record<string, Record<string, string>> = {
   book: { planned: "wants to read", in_progress: "is reading", completed: "read", on_hold: "paused", dropped: "dropped" },
@@ -36,6 +37,7 @@ type FeedRow = {
     id: string;
     title: string;
     creator: string | null;
+    release_year: number | null;
     cover_url: string | null;
     media_type: string;
   } | null;
@@ -66,7 +68,7 @@ export default async function FeedPage() {
     const { data } = await supabase
       .from("logs")
       .select(
-        "id, user_id, status, rating, review, created_at, media:media_items(id, title, creator, cover_url, media_type)",
+        "id, user_id, status, rating, review, created_at, media:media_items(id, title, creator, release_year, cover_url, media_type)",
       )
       .in("user_id", followeeIds)
       .order("created_at", { ascending: false })
@@ -141,7 +143,11 @@ export default async function FeedPage() {
                         href={`/review/${row.id}`}
                         className="font-medium text-white/90 hover:underline"
                       >
-                        {row.media.title}
+                        {displayTitle(
+                          row.media.title,
+                          row.media.release_year,
+                          row.media.media_type,
+                        )}
                       </Link>
                       {row.rating ? (
                         <span className="text-[#f5d56b]">

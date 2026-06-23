@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Cover } from "../_components/Cover";
+import { displayTitle } from "@/lib/format";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A", film: "#D94F4F", tv: "#4F7ED9",
@@ -11,6 +12,7 @@ type Media = {
   id: string;
   title: string;
   creator: string | null;
+  release_year: number | null;
   cover_url: string | null;
   media_type: string;
 };
@@ -43,7 +45,7 @@ function MediaGrid({ items }: { items: Media[] }) {
             </div>
           </Link>
           <p className="mt-2 line-clamp-2 text-sm font-medium leading-tight">
-            {m.title}
+            {displayTitle(m.title, m.release_year, m.media_type)}
           </p>
           <p className="text-xs text-white/50">{m.creator ?? ""}</p>
         </li>
@@ -112,7 +114,7 @@ export default async function DiscoverPage({
     // Browse: most recently catalogued media + some people.
     const { data: mediaData } = await supabase
       .from("media_items")
-      .select("id, title, creator, cover_url, media_type")
+      .select("id, title, creator, release_year, cover_url, media_type")
       .order("created_at", { ascending: false })
       .limit(18);
     media = (mediaData ?? []) as Media[];

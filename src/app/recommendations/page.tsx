@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Cover } from "../_components/Cover";
+import { displayTitle } from "@/lib/format";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A", film: "#D94F4F", tv: "#4F7ED9",
@@ -12,6 +13,7 @@ type Media = {
   id: string;
   title: string;
   creator: string | null;
+  release_year: number | null;
   cover_url: string | null;
   media_type: string;
 };
@@ -29,7 +31,9 @@ function Grid({ items }: { items: Media[] }) {
               </div>
             </div>
           </Link>
-          <p className="mt-2 line-clamp-2 text-sm font-medium leading-tight">{m.title}</p>
+          <p className="mt-2 line-clamp-2 text-sm font-medium leading-tight">
+            {displayTitle(m.title, m.release_year, m.media_type)}
+          </p>
           <p className="text-xs text-white/50">{m.creator ?? ""}</p>
         </li>
       ))}
@@ -73,7 +77,7 @@ export default async function RecommendationsPage() {
   if (topCreators.length > 0) {
     const { data } = await supabase
       .from("media_items")
-      .select("id, title, creator, cover_url, media_type")
+      .select("id, title, creator, release_year, cover_url, media_type")
       .in("creator", topCreators)
       .limit(40);
     byCreators = ((data ?? []) as Media[])
@@ -113,7 +117,7 @@ export default async function RecommendationsPage() {
       if (ranked.length > 0) {
         const { data } = await supabase
           .from("media_items")
-          .select("id, title, creator, cover_url, media_type")
+          .select("id, title, creator, release_year, cover_url, media_type")
           .in("id", ranked);
         const byId = new Map(((data ?? []) as Media[]).map((m) => [m.id, m]));
         tasteMatches = ranked
