@@ -1,5 +1,6 @@
 import { dedupeBy } from "./dedupe";
 import type { MediaDetails } from "./media-details";
+import type { Person, PersonWork } from "./people";
 
 // Open Library book search — called server-side only (per project rules: the
 // app talks to our DB; the backend talks to vendors).
@@ -72,6 +73,7 @@ export async function getBookDetails(
   const d = (await res.json()) as {
     description?: string | { value?: string };
     subjects?: string[];
+    authors?: { author?: { key?: string } }[];
   };
 
   let description: string | null = null;
@@ -82,5 +84,68 @@ export async function getBookDetails(
   if (Array.isArray(d.subjects) && d.subjects.length) {
     facts.push({ label: "Subjects", value: d.subjects.slice(0, 6).join(", ") });
   }
-  return { description, facts };
+
+  // Link the author to their creator page.
+  const authorKey = d.authors?.[0]?.author?.key; // "/authors/OL..A"
+  const authorId = authorKey ? authorKey.replace("/authors/", "") : null;
+
+  return {
+    description,
+    facts,
+    creatorLink: authorId ? { source: "open_library", id: authorId } : null,
+  };
+}
+
+// An author and the books they've written (Open Library author OLID, e.g. OL23919A).
+export async function getOpenLibraryAuthor(
+  authorId: string,
+): Promise<Person | null> {
+  const headers = {
+    "User-Agent": "Bookshelf/0.1 (jamesflower1994@gmail.com)",
+  };
+  const [infoRes, worksRes] = await Promise.all([
+    fetch(`https://openlibrary.org/authors/${authorId}.json`, {
+      headers,
+      next: { revalidate: 86400 },
+    }),
+    fetch(`https://openlibrary.org/authors/${authorId}/works.json?limit=48`, {
+      headers,
+      next: { revalidate: 86400 },
+    }),
+  ]);
+  if (!infoRes.ok) return null;
+
+  const info = (await infoRes.json()) as {
+    name?: string;
+    bio?: string | { value?: string };
+  };
+  const worksData = worksRes.ok
+    ? ((await worksRes.json()) as {
+        entries?: { title?: string; key?: string; covers?: number[] }[];
+      })
+    : { entries: [] };
+
+  const name = info.name ?? "Unknown author";
+  const works: PersonWork[] = (worksData.entries ?? [])
+    .filter((e) => e.key)
+    .map((e) => {
+      const cover = (e.covers ?? []).find((c) => c > 0);
+      return {
+        mediaType: "book",
+        source: "open_library",
+        sourceId: String(e.key).replace("/works/", ""),
+        title: e.title ?? "Untitled",
+        year: null,
+        coverUrl: cover
+          ? `https://covers.openlibrary.org/b/id/${cover}-M.jpg`
+          : null,
+        role: null,
+        creator: name,
+      };
+    });
+
+  const bio =
+    typeof info.bio === "string" ? info.bio : info.bio?.value ?? null;
+
+  return { name, subtitle: "Author", photoUrl: null, bio, works };
 }

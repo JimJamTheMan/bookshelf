@@ -233,6 +233,18 @@ export async function getScreenDetails(
   };
 }
 
+// The person's Wikidata id (for cross-media linking), or null.
+export async function getTmdbWikidataId(id: string): Promise<string | null> {
+  try {
+    const data = (await tmdbGet(`/person/${id}/external_ids`, {})) as {
+      wikidata_id?: string | null;
+    };
+    return data.wikidata_id || null;
+  } catch {
+    return null;
+  }
+}
+
 const PROFILE_BASE = "https://image.tmdb.org/t/p/w185";
 
 // A person (actor/director/writer) and everything they're credited on.

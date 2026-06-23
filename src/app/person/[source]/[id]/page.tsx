@@ -69,6 +69,9 @@ export default async function PersonPage({
                   <input type="hidden" name="source" value={w.source} />
                   <input type="hidden" name="source_id" value={w.sourceId} />
                   <input type="hidden" name="title" value={w.title} />
+                  {w.creator && (
+                    <input type="hidden" name="creator" value={w.creator} />
+                  )}
                   <input
                     type="hidden"
                     name="release_year"

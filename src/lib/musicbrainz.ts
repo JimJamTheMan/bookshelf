@@ -101,6 +101,27 @@ export async function getMusicDetails(
   };
 }
 
+// The artist's Wikidata id (for cross-media linking), or null.
+export async function getMusicbrainzWikidataId(
+  mbid: string,
+): Promise<string | null> {
+  try {
+    const res = await fetch(
+      `https://musicbrainz.org/ws/2/artist/${mbid}?inc=url-rels&fmt=json`,
+      { headers: { "User-Agent": UA }, next: { revalidate: 86400 } },
+    );
+    if (!res.ok) return null;
+    const d = (await res.json()) as {
+      relations?: { type?: string; url?: { resource?: string } }[];
+    };
+    const rel = (d.relations ?? []).find((r) => r.type === "wikidata");
+    const match = rel?.url?.resource?.match(/Q\d+/);
+    return match ? match[0] : null;
+  } catch {
+    return null;
+  }
+}
+
 // A music artist/band and their discography (release groups = albums/EPs).
 export async function getMusicArtist(mbid: string): Promise<Person | null> {
   const url = `https://musicbrainz.org/ws/2/artist/${mbid}?inc=release-groups&fmt=json`;
