@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Cover } from "../../../_components/Cover";
-import { fetchPerson } from "@/lib/people";
+import { fetchPerson, type PersonWork } from "@/lib/people";
 import { openMedia } from "@/app/media-actions";
 import { displayTitle } from "@/lib/format";
 
@@ -9,6 +9,42 @@ const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A", film: "#D94F4F", tv: "#4F7ED9",
   music: "#D94FB8", game: "#7A4FD9", art: "#BFA34F",
 };
+
+const SECTION_ORDER = ["film", "tv", "music", "book", "art", "game"];
+const SECTION_LABEL: Record<string, string> = {
+  film: "Films", tv: "TV", music: "Music", book: "Books", art: "Art", game: "Games",
+};
+
+function WorkTile({ w }: { w: PersonWork }) {
+  const color = MEDIA_COLOR[w.mediaType] ?? "#888";
+  return (
+    <li>
+      <form action={openMedia}>
+        <input type="hidden" name="media_type" value={w.mediaType} />
+        <input type="hidden" name="source" value={w.source} />
+        <input type="hidden" name="source_id" value={w.sourceId} />
+        <input type="hidden" name="title" value={w.title} />
+        {w.creator && <input type="hidden" name="creator" value={w.creator} />}
+        <input type="hidden" name="release_year" value={w.year ?? ""} />
+        <input type="hidden" name="cover_url" value={w.coverUrl ?? ""} />
+        <button type="submit" className="block w-full text-left">
+          <div className="flex overflow-hidden rounded border border-white/10">
+            <div className="w-1 shrink-0" style={{ background: color }} />
+            <div className="aspect-[2/3] flex-1 bg-black/30">
+              <Cover src={w.coverUrl} title={w.title} color={color} />
+            </div>
+          </div>
+          <p className="mt-2 line-clamp-2 text-sm font-medium leading-tight">
+            {displayTitle(w.title, w.year, w.mediaType)}
+          </p>
+          {w.role && (
+            <p className="line-clamp-1 text-xs text-white/40">{w.role}</p>
+          )}
+        </button>
+      </form>
+    </li>
+  );
+}
 
 export default async function PersonPage({
   params,
@@ -55,58 +91,26 @@ export default async function PersonPage({
           </p>
         )}
 
-        <h2 className="mt-8 text-sm font-medium uppercase tracking-wide text-white/40">
-          Known for
-        </h2>
         {person.works.length === 0 ? (
-          <p className="mt-3 text-sm text-white/50">Nothing found.</p>
+          <p className="mt-8 text-sm text-white/50">Nothing found.</p>
         ) : (
-          <ul className="mt-3 grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-            {person.works.map((w) => (
-              <li key={`${w.mediaType}-${w.sourceId}`}>
-                <form action={openMedia}>
-                  <input type="hidden" name="media_type" value={w.mediaType} />
-                  <input type="hidden" name="source" value={w.source} />
-                  <input type="hidden" name="source_id" value={w.sourceId} />
-                  <input type="hidden" name="title" value={w.title} />
-                  {w.creator && (
-                    <input type="hidden" name="creator" value={w.creator} />
-                  )}
-                  <input
-                    type="hidden"
-                    name="release_year"
-                    value={w.year ?? ""}
-                  />
-                  <input
-                    type="hidden"
-                    name="cover_url"
-                    value={w.coverUrl ?? ""}
-                  />
-                  <button type="submit" className="block w-full text-left">
-                    <div className="flex overflow-hidden rounded border border-white/10">
-                      <div
-                        className="w-1 shrink-0"
-                        style={{ background: MEDIA_COLOR[w.mediaType] ?? "#888" }}
-                      />
-                      <div className="aspect-[2/3] flex-1 bg-black/30">
-                        <Cover
-                          src={w.coverUrl}
-                          title={w.title}
-                          color={MEDIA_COLOR[w.mediaType] ?? "#888"}
-                        />
-                      </div>
-                    </div>
-                    <p className="mt-2 line-clamp-2 text-sm font-medium leading-tight">
-                      {displayTitle(w.title, w.year, w.mediaType)}
-                    </p>
-                    {w.role && (
-                      <p className="line-clamp-1 text-xs text-white/40">{w.role}</p>
-                    )}
-                  </button>
-                </form>
-              </li>
-            ))}
-          </ul>
+          SECTION_ORDER.map((type) => {
+            const items = person.works.filter((w) => w.mediaType === type);
+            if (items.length === 0) return null;
+            return (
+              <section key={type} className="mt-8">
+                <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
+                  {SECTION_LABEL[type] ?? type}{" "}
+                  <span className="text-white/25">{items.length}</span>
+                </h2>
+                <ul className="mt-3 grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+                  {items.map((w) => (
+                    <WorkTile key={`${w.mediaType}-${w.sourceId}`} w={w} />
+                  ))}
+                </ul>
+              </section>
+            );
+          })
         )}
       </div>
     </main>
