@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { searchBooks, type BookResult } from "@/lib/openlibrary";
-import { startLog } from "../media-actions";
+import { openMedia, startLog } from "../media-actions";
 
 const BOOK_COLOR = "#4FBF7A"; // the fixed accent colour for books
 
@@ -98,7 +98,7 @@ export default async function BooksPage({
                   {book.author ?? "Unknown author"}
                   {book.year ? ` · ${book.year}` : ""}
                 </p>
-                <form action={startLog} className="mt-2">
+                <form action={openMedia} className="mt-2 flex gap-2">
                   <input type="hidden" name="media_type" value="book" />
                   <input type="hidden" name="source" value="open_library" />
                   <input type="hidden" name="source_id" value={book.sourceId} />
@@ -114,8 +114,14 @@ export default async function BooksPage({
                     name="cover_url"
                     value={book.coverUrl ?? ""}
                   />
-                  <button className="w-full rounded border border-white/20 px-2 py-1.5 text-xs font-medium hover:bg-white/5">
-                    Log this book
+                  <button className="flex-1 rounded bg-[#f5f3ee] px-2 py-1.5 text-xs font-medium text-[#15130f] hover:bg-white">
+                    View
+                  </button>
+                  <button
+                    formAction={startLog}
+                    className="flex-1 rounded border border-white/20 px-2 py-1.5 text-xs font-medium hover:bg-white/5"
+                  >
+                    Log
                   </button>
                 </form>
               </li>

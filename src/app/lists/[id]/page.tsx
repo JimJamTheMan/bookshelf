@@ -92,7 +92,7 @@ export default async function ListDetailPage({
             {items.map((it) =>
               it.media ? (
                 <li key={it.media_id}>
-                  <Link href={`/log/${it.media.id}`}>
+                  <Link href={`/media/${it.media.id}`}>
                     <div className="flex overflow-hidden rounded border border-white/10">
                       <div
                         className="w-1 shrink-0"

@@ -117,7 +117,8 @@ export default async function PublicProfilePage({
         </div>
 
         <div className="px-6 pb-6">
-          <div className="-mt-10 flex items-end gap-4">
+          {/* Avatar overlaps the banner; everything else sits below it */}
+          <div className="-mt-12">
             {profile.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -132,37 +133,40 @@ export default async function PublicProfilePage({
                 style={{ background: accent, borderColor: "#15130f" }}
               />
             )}
-          <div className="flex-1">
-            <h1 className="text-2xl font-semibold tracking-tight">
-              {profile.display_name || profile.handle}
-            </h1>
-            <p className="text-sm text-white/50">@{profile.handle}</p>
           </div>
 
-          {user && !isSelf && (
-            <form action={isFollowing ? unfollow : follow}>
-              <input type="hidden" name="followee_id" value={profile.id} />
-              <input type="hidden" name="handle" value={profile.handle} />
-              <button
-                className={
-                  isFollowing
-                    ? "rounded border border-white/20 px-4 py-2 text-sm font-medium hover:bg-white/5"
-                    : "rounded bg-[#f5f3ee] px-4 py-2 text-sm font-medium text-[#15130f] hover:bg-white"
-                }
+          <div className="mt-3 flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <h1 className="text-2xl font-semibold tracking-tight">
+                {profile.display_name || profile.handle}
+              </h1>
+              <p className="text-sm text-white/50">@{profile.handle}</p>
+            </div>
+
+            {user && !isSelf && (
+              <form action={isFollowing ? unfollow : follow} className="shrink-0">
+                <input type="hidden" name="followee_id" value={profile.id} />
+                <input type="hidden" name="handle" value={profile.handle} />
+                <button
+                  className={
+                    isFollowing
+                      ? "rounded border border-white/20 px-4 py-2 text-sm font-medium hover:bg-white/5"
+                      : "rounded bg-[#f5f3ee] px-4 py-2 text-sm font-medium text-[#15130f] hover:bg-white"
+                  }
+                >
+                  {isFollowing ? "Following" : "Follow"}
+                </button>
+              </form>
+            )}
+            {isSelf && (
+              <Link
+                href="/profile"
+                className="shrink-0 rounded border border-white/20 px-4 py-2 text-sm font-medium hover:bg-white/5"
               >
-                {isFollowing ? "Following" : "Follow"}
-              </button>
-            </form>
-          )}
-          {isSelf && (
-            <Link
-              href="/profile"
-              className="rounded border border-white/20 px-4 py-2 text-sm font-medium hover:bg-white/5"
-            >
-              Edit profile
-            </Link>
-          )}
-        </div>
+                Edit profile
+              </Link>
+            )}
+          </div>
 
         {profile.bio && (
           <p className="mt-4 text-sm text-white/80 whitespace-pre-wrap">
@@ -189,7 +193,7 @@ export default async function PublicProfilePage({
             <ul className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4">
               {featured.map((m) => (
                 <li key={m.id}>
-                  <Link href={`/log/${m.id}`}>
+                  <Link href={`/media/${m.id}`}>
                     <div className="flex overflow-hidden rounded border border-white/10">
                       <div
                         className="w-1 shrink-0"

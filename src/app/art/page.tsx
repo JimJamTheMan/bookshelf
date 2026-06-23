@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { searchArt, type ArtResult } from "@/lib/wikimedia";
-import { startLog } from "../media-actions";
+import { openMedia, startLog } from "../media-actions";
 import { Cover } from "../_components/Cover";
 
 const ART_COLOR = "#BFA34F"; // accent colour for art
@@ -82,7 +82,7 @@ export default async function ArtPage({
                 <p className="text-xs text-white/50 line-clamp-1">
                   {art.artist ?? "Unknown artist"}
                 </p>
-                <form action={startLog} className="mt-2">
+                <form action={openMedia} className="mt-2 flex gap-2">
                   <input type="hidden" name="media_type" value="art" />
                   <input type="hidden" name="source" value="wikimedia" />
                   <input type="hidden" name="source_id" value={art.sourceId} />
@@ -93,8 +93,14 @@ export default async function ArtPage({
                     name="cover_url"
                     value={art.coverUrl ?? ""}
                   />
-                  <button className="w-full rounded border border-white/20 px-2 py-1.5 text-xs font-medium hover:bg-white/5">
-                    Log this artwork
+                  <button className="flex-1 rounded bg-[#f5f3ee] px-2 py-1.5 text-xs font-medium text-[#15130f] hover:bg-white">
+                    View
+                  </button>
+                  <button
+                    formAction={startLog}
+                    className="flex-1 rounded border border-white/20 px-2 py-1.5 text-xs font-medium hover:bg-white/5"
+                  >
+                    Log
                   </button>
                 </form>
               </li>

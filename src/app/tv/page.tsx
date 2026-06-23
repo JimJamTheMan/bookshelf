@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { searchTv, type ScreenResult } from "@/lib/tmdb";
-import { startLog } from "../media-actions";
+import { openMedia, startLog } from "../media-actions";
 
 const TV_COLOR = "#4F7ED9"; // the fixed accent colour for TV
 
@@ -97,7 +97,7 @@ export default async function TvPage({
                   {show.title}
                 </p>
                 <p className="text-xs text-white/50">{show.year ?? "—"}</p>
-                <form action={startLog} className="mt-2">
+                <form action={openMedia} className="mt-2 flex gap-2">
                   <input type="hidden" name="media_type" value="tv" />
                   <input type="hidden" name="source" value="tmdb" />
                   <input type="hidden" name="source_id" value={show.sourceId} />
@@ -117,8 +117,14 @@ export default async function TvPage({
                     name="description"
                     value={show.description ?? ""}
                   />
-                  <button className="w-full rounded border border-white/20 px-2 py-1.5 text-xs font-medium hover:bg-white/5">
-                    Log this show
+                  <button className="flex-1 rounded bg-[#f5f3ee] px-2 py-1.5 text-xs font-medium text-[#15130f] hover:bg-white">
+                    View
+                  </button>
+                  <button
+                    formAction={startLog}
+                    className="flex-1 rounded border border-white/20 px-2 py-1.5 text-xs font-medium hover:bg-white/5"
+                  >
+                    Log
                   </button>
                 </form>
               </li>

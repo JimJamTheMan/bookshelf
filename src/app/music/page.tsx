@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { searchMusic, type MusicResult } from "@/lib/musicbrainz";
-import { startLog } from "../media-actions";
+import { openMedia, startLog } from "../media-actions";
 import { Cover } from "../_components/Cover";
 
 const MUSIC_COLOR = "#D94FB8"; // the fixed accent colour for music
@@ -85,7 +85,7 @@ export default async function MusicPage({
                   {album.artist ?? "Unknown artist"}
                   {album.year ? ` · ${album.year}` : ""}
                 </p>
-                <form action={startLog} className="mt-2">
+                <form action={openMedia} className="mt-2 flex gap-2">
                   <input type="hidden" name="media_type" value="music" />
                   <input type="hidden" name="source" value="musicbrainz" />
                   <input type="hidden" name="source_id" value={album.sourceId} />
@@ -105,8 +105,14 @@ export default async function MusicPage({
                     name="cover_url"
                     value={album.coverUrl ?? ""}
                   />
-                  <button className="w-full rounded border border-white/20 px-2 py-1.5 text-xs font-medium hover:bg-white/5">
-                    Log this album
+                  <button className="flex-1 rounded bg-[#f5f3ee] px-2 py-1.5 text-xs font-medium text-[#15130f] hover:bg-white">
+                    View
+                  </button>
+                  <button
+                    formAction={startLog}
+                    className="flex-1 rounded border border-white/20 px-2 py-1.5 text-xs font-medium hover:bg-white/5"
+                  >
+                    Log
                   </button>
                 </form>
               </li>

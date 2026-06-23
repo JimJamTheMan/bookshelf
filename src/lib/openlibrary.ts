@@ -1,4 +1,5 @@
 import { dedupeBy } from "./dedupe";
+import type { MediaDetails } from "./media-details";
 
 // Open Library book search — called server-side only (per project rules: the
 // app talks to our DB; the backend talks to vendors).
@@ -56,4 +57,30 @@ export async function searchBooks(query: string): Promise<BookResult[]> {
     t.replace(/[[(].*?[\])]/g, "").replace(/\s+/g, " ").trim();
 
   return dedupeBy(results, (b) => `${normalize(b.title)}|${b.author ?? ""}`);
+}
+
+// Full details for one book (work).
+export async function getBookDetails(
+  workId: string,
+): Promise<MediaDetails | null> {
+  const res = await fetch(`https://openlibrary.org/works/${workId}.json`, {
+    headers: { "User-Agent": "Bookshelf/0.1 (jamesflower1994@gmail.com)" },
+    next: { revalidate: 86400 },
+  });
+  if (!res.ok) return null;
+
+  const d = (await res.json()) as {
+    description?: string | { value?: string };
+    subjects?: string[];
+  };
+
+  let description: string | null = null;
+  if (typeof d.description === "string") description = d.description;
+  else if (d.description?.value) description = d.description.value;
+
+  const facts: { label: string; value: string }[] = [];
+  if (Array.isArray(d.subjects) && d.subjects.length) {
+    facts.push({ label: "Subjects", value: d.subjects.slice(0, 6).join(", ") });
+  }
+  return { description, facts };
 }

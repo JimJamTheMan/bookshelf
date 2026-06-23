@@ -3,9 +3,10 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-// Generic "cache a chosen item then open its log form" action, used by every
-// media type's search page. The media_type and source come from hidden fields.
-export async function startLog(formData: FormData) {
+// Cache a chosen search result into the catalogue (via the official
+// upsert_media_item path) and return its internal id. media_type/source and the
+// display fields come from the search page's hidden form fields.
+async function cacheChosenMedia(formData: FormData): Promise<string> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -51,5 +52,17 @@ export async function startLog(formData: FormData) {
     redirect("/?error=" + encodeURIComponent("Saved the item but couldn't open it."));
   }
 
-  redirect(`/log/${media.id}`);
+  return media.id as string;
+}
+
+// Open a chosen item's detail page (the default click on a search result).
+export async function openMedia(formData: FormData) {
+  const id = await cacheChosenMedia(formData);
+  redirect(`/media/${id}`);
+}
+
+// Cache a chosen item and go straight to its log form.
+export async function startLog(formData: FormData) {
+  const id = await cacheChosenMedia(formData);
+  redirect(`/log/${id}`);
 }

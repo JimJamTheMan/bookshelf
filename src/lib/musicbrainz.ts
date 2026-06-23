@@ -1,4 +1,5 @@
 import { dedupeBy } from "./dedupe";
+import type { MediaDetails } from "./media-details";
 
 // Music search via MusicBrainz (metadata) + Cover Art Archive (covers).
 // Server-side only. MusicBrainz requires a descriptive User-Agent and limits to
@@ -50,4 +51,43 @@ export async function searchMusic(query: string): Promise<MusicResult[]> {
   });
 
   return dedupeBy(results, (a) => `${a.title}|${a.artist ?? ""}`);
+}
+
+// Full details for one album (release group).
+export async function getMusicDetails(
+  id: string,
+): Promise<MediaDetails | null> {
+  const url = `https://musicbrainz.org/ws/2/release-group/${id}?inc=artists+tags&fmt=json`;
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent": "Bookshelf/0.1 (dev contact: jamesflower1994@gmail.com)",
+    },
+    next: { revalidate: 86400 },
+  });
+  if (!res.ok) return null;
+
+  const d = (await res.json()) as {
+    "artist-credit"?: { name?: string }[];
+    "primary-type"?: string;
+    "first-release-date"?: string;
+    tags?: { name: string; count?: number }[];
+  };
+
+  const facts: { label: string; value: string }[] = [];
+  const artist = (d["artist-credit"] ?? [])
+    .map((a) => a.name)
+    .filter(Boolean)
+    .join(", ");
+  if (artist) facts.push({ label: "Artist", value: artist });
+  if (d["primary-type"]) facts.push({ label: "Type", value: d["primary-type"] });
+  if (d["first-release-date"])
+    facts.push({ label: "Released", value: d["first-release-date"] });
+  const tags = (d.tags ?? [])
+    .sort((a, b) => (b.count ?? 0) - (a.count ?? 0))
+    .slice(0, 6)
+    .map((t) => t.name)
+    .join(", ");
+  if (tags) facts.push({ label: "Tags", value: tags });
+
+  return { description: null, facts };
 }

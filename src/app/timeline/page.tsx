@@ -107,7 +107,7 @@ export default async function TimelinePage() {
                   className="flex gap-4 rounded-lg border border-white/10 bg-black/20 p-4"
                 >
                   <Link
-                    href={`/log/${row.media.id}`}
+                    href={`/media/${row.media.id}`}
                     className="flex w-16 shrink-0 overflow-hidden rounded border border-white/10 self-start"
                   >
                     <div
@@ -144,7 +144,7 @@ export default async function TimelinePage() {
                     </div>
 
                     <Link
-                      href={`/log/${row.media.id}`}
+                      href={`/media/${row.media.id}`}
                       className="mt-1 block font-medium leading-tight hover:underline"
                     >
                       {row.media.title}

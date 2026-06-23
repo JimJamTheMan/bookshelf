@@ -115,7 +115,7 @@ export default async function FeedPage() {
                   className="flex gap-4 rounded-lg border border-white/10 bg-black/20 p-4"
                 >
                   <Link
-                    href={`/review/${row.id}`}
+                    href={`/media/${row.media.id}`}
                     className="flex w-14 shrink-0 self-start overflow-hidden rounded border border-white/10"
                   >
                     <div className="w-1 shrink-0" style={{ background: color }} />

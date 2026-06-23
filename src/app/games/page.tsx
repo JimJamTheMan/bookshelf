@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { searchGames, type GameResult } from "@/lib/igdb";
-import { startLog } from "../media-actions";
+import { openMedia, startLog } from "../media-actions";
 
 const GAME_COLOR = "#7A4FD9"; // the fixed accent colour for games
 
@@ -97,7 +97,7 @@ export default async function GamesPage({
                   {game.title}
                 </p>
                 <p className="text-xs text-white/50">{game.year ?? "—"}</p>
-                <form action={startLog} className="mt-2">
+                <form action={openMedia} className="mt-2 flex gap-2">
                   <input type="hidden" name="media_type" value="game" />
                   <input type="hidden" name="source" value="igdb" />
                   <input type="hidden" name="source_id" value={game.sourceId} />
@@ -117,8 +117,14 @@ export default async function GamesPage({
                     name="description"
                     value={game.description ?? ""}
                   />
-                  <button className="w-full rounded border border-white/20 px-2 py-1.5 text-xs font-medium hover:bg-white/5">
-                    Log this game
+                  <button className="flex-1 rounded bg-[#f5f3ee] px-2 py-1.5 text-xs font-medium text-[#15130f] hover:bg-white">
+                    View
+                  </button>
+                  <button
+                    formAction={startLog}
+                    className="flex-1 rounded border border-white/20 px-2 py-1.5 text-xs font-medium hover:bg-white/5"
+                  >
+                    Log
                   </button>
                 </form>
               </li>

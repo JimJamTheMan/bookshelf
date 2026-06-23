@@ -1,4 +1,5 @@
 import { dedupeBy } from "./dedupe";
+import type { MediaDetails } from "./media-details";
 
 // IGDB game search — called server-side only. IGDB is owned by Twitch, so we
 // exchange a Twitch Client ID + Secret for an OAuth token (cached in memory
@@ -89,4 +90,45 @@ export async function searchGames(query: string): Promise<GameResult[]> {
   }));
 
   return dedupeBy(results, (g) => `${g.title}|${g.year ?? ""}`);
+}
+
+// Full details for one game.
+export async function getGameDetails(id: string): Promise<MediaDetails | null> {
+  const token = await getToken();
+  const clientId = process.env.TWITCH_CLIENT_ID!;
+
+  const body = `fields name, summary, storyline, genres.name, platforms.name, total_rating, involved_companies.company.name, involved_companies.developer; where id = ${Number(id)};`;
+  const res = await fetch("https://api.igdb.com/v4/games", {
+    method: "POST",
+    headers: {
+      "Client-ID": clientId,
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "text/plain",
+    },
+    body,
+  });
+  if (!res.ok) return null;
+
+  const arr = (await res.json()) as Array<{
+    summary?: string;
+    storyline?: string;
+    genres?: { name: string }[];
+    platforms?: { name: string }[];
+    total_rating?: number;
+    involved_companies?: { developer?: boolean; company?: { name: string } }[];
+  }>;
+  const g = arr[0];
+  if (!g) return null;
+
+  const facts: { label: string; value: string }[] = [];
+  const genres = (g.genres ?? []).map((x) => x.name).join(", ");
+  if (genres) facts.push({ label: "Genres", value: genres });
+  const platforms = (g.platforms ?? []).map((x) => x.name).join(", ");
+  if (platforms) facts.push({ label: "Platforms", value: platforms });
+  const dev = (g.involved_companies ?? []).find((c) => c.developer)?.company?.name;
+  if (dev) facts.push({ label: "Developer", value: dev });
+  if (g.total_rating)
+    facts.push({ label: "IGDB score", value: `${Math.round(g.total_rating)}/100` });
+
+  return { description: g.summary || g.storyline || null, facts };
 }

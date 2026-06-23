@@ -2,14 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { starsFromRating } from "@/lib/stars";
-
-const STATUS_LABEL: Record<string, string> = {
-  planned: "Want to read",
-  in_progress: "Reading",
-  completed: "Read",
-  on_hold: "On hold",
-  dropped: "Dropped",
-};
+import { statusLabel } from "@/lib/status";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A",
@@ -36,9 +29,10 @@ type ShelfRow = {
 export default async function ShelfPage({
   searchParams,
 }: {
-  searchParams: Promise<{ message?: string }>;
+  searchParams: Promise<{ message?: string; q?: string }>;
 }) {
-  const { message } = await searchParams;
+  const { message, q } = await searchParams;
+  const query = (q ?? "").trim();
 
   const supabase = await createClient();
   const {
@@ -57,7 +51,18 @@ export default async function ShelfPage({
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
-  const rows = (data ?? []) as unknown as ShelfRow[];
+  let rows = (data ?? []) as unknown as ShelfRow[];
+
+  // Filter by title/creator if searching.
+  if (query) {
+    const needle = query.toLowerCase();
+    rows = rows.filter(
+      (r) =>
+        r.media &&
+        ((r.media.title ?? "").toLowerCase().includes(needle) ||
+          (r.media.creator ?? "").toLowerCase().includes(needle)),
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[#15130f] text-[#f5f3ee] p-8">
@@ -69,6 +74,27 @@ export default async function ShelfPage({
           </Link>
         </div>
 
+        <form method="get" className="mt-6 flex gap-3">
+          <input
+            type="search"
+            name="q"
+            defaultValue={query}
+            placeholder="Search your shelf by title or creator…"
+            className="flex-1 rounded border border-white/15 bg-black/30 px-3 py-2 text-sm outline-none focus:border-white/40"
+          />
+          <button className="rounded bg-[#f5f3ee] px-4 py-2 text-sm font-medium text-[#15130f] hover:bg-white">
+            Search
+          </button>
+          {query && (
+            <Link
+              href="/shelf"
+              className="rounded border border-white/20 px-4 py-2 text-sm font-medium hover:bg-white/5"
+            >
+              Clear
+            </Link>
+          )}
+        </form>
+
         {message && (
           <p className="mt-4 rounded bg-[#4FBF7A]/15 border border-[#4FBF7A]/30 p-3 text-sm text-[#9be3b8]">
             {message}
@@ -77,20 +103,26 @@ export default async function ShelfPage({
 
         {rows.length === 0 ? (
           <div className="mt-10 text-center text-sm text-white/50">
-            <p>Your shelf is empty.</p>
-            <Link
-              href="/books"
-              className="mt-4 inline-block rounded bg-[#f5f3ee] px-4 py-2 font-medium text-[#15130f] hover:bg-white"
-            >
-              Search for a book to log
-            </Link>
+            {query ? (
+              <p>Nothing on your shelf matches “{query}”.</p>
+            ) : (
+              <>
+                <p>Your shelf is empty.</p>
+                <Link
+                  href="/books"
+                  className="mt-4 inline-block rounded bg-[#f5f3ee] px-4 py-2 font-medium text-[#15130f] hover:bg-white"
+                >
+                  Search for something to log
+                </Link>
+              </>
+            )}
           </div>
         ) : (
           <ul className="mt-8 grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
             {rows.map((row) =>
               row.media ? (
                 <li key={row.media.id}>
-                  <Link href={`/log/${row.media.id}`}>
+                  <Link href={`/media/${row.media.id}`}>
                     <div className="flex overflow-hidden rounded border border-white/10">
                       <div
                         className="w-1 shrink-0"
@@ -127,7 +159,7 @@ export default async function ShelfPage({
                     {row.media.title}
                   </p>
                   <p className="text-xs text-white/50">
-                    {STATUS_LABEL[row.status] ?? row.status}
+                    {statusLabel(row.media.media_type, row.status)}
                     {row.rating ? ` · ${starsFromRating(row.rating)}` : ""}
                   </p>
                 </li>

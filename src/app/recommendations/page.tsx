@@ -21,7 +21,7 @@ function Grid({ items }: { items: Media[] }) {
     <ul className="mt-3 grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
       {items.map((m) => (
         <li key={m.id}>
-          <Link href={`/log/${m.id}`}>
+          <Link href={`/media/${m.id}`}>
             <div className="flex overflow-hidden rounded border border-white/10">
               <div className="w-1 shrink-0" style={{ background: MEDIA_COLOR[m.media_type] ?? "#888" }} />
               <div className="aspect-[2/3] flex-1 bg-black/30">
