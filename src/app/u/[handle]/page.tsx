@@ -116,7 +116,7 @@ export default async function PublicProfilePage({
           </Link>
         </div>
 
-        <div className="px-6 pb-6">
+        <div className="relative z-10 px-6 pb-6">
           {/* Avatar overlaps the banner; everything else sits below it */}
           <div className="-mt-12">
             {profile.avatar_url ? (
