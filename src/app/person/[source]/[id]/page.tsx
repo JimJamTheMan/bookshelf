@@ -91,6 +91,26 @@ export default async function PersonPage({
           </p>
         )}
 
+        {person.related && person.related.length > 0 && (
+          <section className="mt-6">
+            <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
+              {person.relatedLabel ?? "Related"}
+            </h2>
+            <ul className="mt-2 flex flex-wrap gap-2">
+              {person.related.map((m) => (
+                <li key={m.id}>
+                  <Link
+                    href={`/person/${m.source}/${m.id}`}
+                    className="inline-block rounded-full border border-white/15 px-3 py-1 text-sm text-white/80 hover:border-white/40 hover:bg-white/5"
+                  >
+                    {m.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
         {person.works.length === 0 ? (
           <p className="mt-8 text-sm text-white/50">Nothing found.</p>
         ) : (

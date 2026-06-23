@@ -22,12 +22,20 @@ export type PersonWork = {
   creator?: string | null; // e.g. author name, for logging books
 };
 
+export type RelatedPerson = {
+  id: string;
+  name: string;
+  source: string;
+};
+
 export type Person = {
   name: string;
   subtitle: string | null;
   photoUrl: string | null;
   bio: string | null;
   works: PersonWork[];
+  related?: RelatedPerson[]; // band members, or bands a person is in
+  relatedLabel?: string | null; // "Members" or "Member of"
 };
 
 const MEDIA_NOUN: Record<string, string> = {
@@ -115,6 +123,8 @@ export async function fetchPerson(
       photoUrl: base.photoUrl || tmdbExtra?.photoUrl || null,
       bio: base.bio || tmdbExtra?.bio || null,
       works,
+      related: base.related ?? musicExtra?.related ?? [],
+      relatedLabel: base.relatedLabel ?? musicExtra?.relatedLabel ?? null,
     };
   } catch {
     return null;

@@ -1,6 +1,6 @@
 import { dedupeBy } from "./dedupe";
 import type { MediaDetails } from "./media-details";
-import type { Person, PersonWork } from "./people";
+import type { Person, PersonWork, RelatedPerson } from "./people";
 
 const UA = "Bookshelf/0.1 (dev contact: jamesflower1994@gmail.com)";
 
@@ -157,7 +157,7 @@ export async function getMusicbrainzWikidataId(
 
 // A music artist/band and their discography (release groups = albums/EPs).
 export async function getMusicArtist(mbid: string): Promise<Person | null> {
-  const url = `https://musicbrainz.org/ws/2/artist/${mbid}?inc=release-groups&fmt=json`;
+  const url = `https://musicbrainz.org/ws/2/artist/${mbid}?inc=release-groups+artist-rels&fmt=json`;
   const res = await fetch(url, {
     headers: { "User-Agent": UA },
     next: { revalidate: 86400 },
@@ -174,8 +174,27 @@ export async function getMusicArtist(mbid: string): Promise<Person | null> {
       "primary-type"?: string;
       "secondary-types"?: string[];
     }[];
+    relations?: {
+      type?: string;
+      artist?: { id?: string; name?: string };
+    }[];
   };
   if (!d.name) return null;
+
+  // Band members (if a group) or bands they're in (if a person).
+  const relSeen = new Set<string>();
+  const related: RelatedPerson[] = [];
+  for (const r of d.relations ?? []) {
+    if (r.type !== "member of band" || !r.artist?.id) continue;
+    if (relSeen.has(r.artist.id)) continue;
+    relSeen.add(r.artist.id);
+    related.push({
+      id: r.artist.id,
+      name: r.artist.name ?? "Unknown",
+      source: "musicbrainz",
+    });
+  }
+  const relatedLabel = d.type === "Group" ? "Members" : "Member of";
 
   const EXCLUDE_SECONDARY = new Set([
     "Audiobook",
@@ -218,5 +237,7 @@ export async function getMusicArtist(mbid: string): Promise<Person | null> {
     photoUrl: null, // MusicBrainz has no artist images
     bio: null,
     works,
+    related: related.slice(0, 30),
+    relatedLabel: related.length > 0 ? relatedLabel : null,
   };
 }
