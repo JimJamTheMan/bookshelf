@@ -268,8 +268,14 @@ export async function getTmdbPerson(id: string): Promise<Person | null> {
     ...(data.combined_credits?.crew ?? []),
   ] as (RawWork & { media_type?: string; character?: string; job?: string })[];
 
+  // Drop "as themselves" guest spots (talk shows, award shows, etc.) — they're
+  // not real roles and otherwise flood the list.
+  const isSelfAppearance = (character?: string) =>
+    !!character && /\b(self|himself|herself|themselves)\b/i.test(character);
+
+  const films: PersonWork[] = [];
+  const tv: PersonWork[] = [];
   const seen = new Set<string>();
-  const works: PersonWork[] = [];
   for (const w of credits.sort(
     (a, b) => (b.popularity ?? 0) - (a.popularity ?? 0),
   )) {
@@ -277,7 +283,8 @@ export async function getTmdbPerson(id: string): Promise<Person | null> {
     const key = `${w.media_type}-${w.id}`;
     if (seen.has(key)) continue;
     seen.add(key);
-    works.push({
+    if (isSelfAppearance(w.character)) continue;
+    const work: PersonWork = {
       mediaType: isTv ? "tv" : "film",
       source: "tmdb",
       sourceId: String(w.id),
@@ -285,14 +292,18 @@ export async function getTmdbPerson(id: string): Promise<Person | null> {
       year: yearFrom(isTv ? w.first_air_date : w.release_date),
       coverUrl: w.poster_path ? `${IMG_BASE}${w.poster_path}` : null,
       role: w.character || w.job || null,
-    });
+    };
+    (isTv ? tv : films).push(work);
   }
+
+  // Cap each medium separately so films aren't crowded out by TV.
+  const works = [...films.slice(0, 80), ...tv.slice(0, 30)];
 
   return {
     name: data.name,
     subtitle: data.known_for_department ?? null,
     photoUrl: data.profile_path ? `${PROFILE_BASE}${data.profile_path}` : null,
     bio: data.biography || null,
-    works: works.slice(0, 48),
+    works,
   };
 }
