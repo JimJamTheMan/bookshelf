@@ -4,6 +4,13 @@ import type { Person, PersonWork, RelatedPerson } from "./people";
 
 const UA = "Bookshelf/0.1 (dev contact: jamesflower1994@gmail.com)";
 
+// MusicBrainz's special placeholder for compilations/soundtracks — not a person.
+const VARIOUS_ARTISTS_MBID = "89ad4ac3-39f7-470e-963a-56509c546377";
+
+function isVariousArtists(id?: string | null, name?: string | null): boolean {
+  return id === VARIOUS_ARTISTS_MBID || name === "Various Artists";
+}
+
 // Music search via MusicBrainz (metadata) + Cover Art Archive (covers).
 // Server-side only. MusicBrainz requires a descriptive User-Agent and limits to
 // ~1 request/second. We search "release groups" (albums), not individual releases.
@@ -125,12 +132,14 @@ export async function getMusicDetails(
     .join(", ");
   if (tags) facts.push({ label: "Tags", value: tags });
 
-  const artistId = d["artist-credit"]?.[0]?.artist?.id ?? null;
+  const ac = d["artist-credit"]?.[0];
+  const artistId = ac?.artist?.id ?? null;
+  const linkable = artistId && !isVariousArtists(artistId, ac?.name);
 
   return {
     description: null,
     facts,
-    creatorLink: artistId ? { source: "musicbrainz", id: artistId } : null,
+    creatorLink: linkable ? { source: "musicbrainz", id: artistId } : null,
   };
 }
 
