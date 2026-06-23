@@ -139,7 +139,7 @@ export default async function MediaPage({
           {creatorLink ? (
             <Link
               href={`/person/${creatorLink.source}/${encodeURIComponent(creatorLink.id)}`}
-              className="hover:underline"
+              className="font-medium text-white/80 underline underline-offset-2 decoration-white/30 hover:decoration-white"
             >
               {media.creator}
             </Link>
@@ -155,7 +155,7 @@ export default async function MediaPage({
               {i > 0 && ", "}
               <Link
                 href={`/person/tmdb/${c.id}`}
-                className="hover:underline"
+                className="font-medium text-white/80 underline underline-offset-2 decoration-white/30 hover:decoration-white"
               >
                 {c.name}
               </Link>

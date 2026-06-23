@@ -220,6 +220,7 @@ export async function getMusicArtist(mbid: string): Promise<Person | null> {
         year: Number.isFinite(year) ? year : null,
         coverUrl: `https://coverartarchive.org/release-group/${rg.id}/front-250`,
         role: rg["primary-type"] ?? null,
+        creator: d.name ?? null,
       };
     })
     .sort((a, b) => (b.year ?? 0) - (a.year ?? 0))
