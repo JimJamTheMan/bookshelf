@@ -172,11 +172,24 @@ export async function getMusicArtist(mbid: string): Promise<Person | null> {
       title?: string;
       "first-release-date"?: string;
       "primary-type"?: string;
+      "secondary-types"?: string[];
     }[];
   };
   if (!d.name) return null;
 
-  const works: PersonWork[] = (d["release-groups"] ?? [])
+  const EXCLUDE_SECONDARY = new Set([
+    "Audiobook",
+    "Audio drama",
+    "Interview",
+    "Spokenword",
+  ]);
+
+  const candidates: PersonWork[] = (d["release-groups"] ?? [])
+    .filter((rg) => {
+      if (rg["primary-type"] === "Broadcast") return false; // radio/podcasts
+      const sec = rg["secondary-types"] ?? [];
+      return !sec.some((s) => EXCLUDE_SECONDARY.has(s));
+    })
     .map((rg) => {
       const date = rg["first-release-date"];
       const year = date ? Number.parseInt(date.slice(0, 4), 10) : null;
@@ -190,7 +203,14 @@ export async function getMusicArtist(mbid: string): Promise<Person | null> {
         role: rg["primary-type"] ?? null,
       };
     })
-    .sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
+    .sort((a, b) => (b.year ?? 0) - (a.year ?? 0))
+    .slice(0, 30); // limit cover-art checks
+
+  // Only keep release groups that actually have cover art.
+  const checked = await Promise.all(
+    candidates.map(async (w) => ({ w, ok: await hasCoverArt(w.sourceId) })),
+  );
+  const works = checked.filter((x) => x.ok).map((x) => x.w);
 
   return {
     name: d.name,
