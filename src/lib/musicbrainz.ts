@@ -35,25 +35,58 @@ export async function searchMusic(query: string): Promise<MusicResult[]> {
       id: string;
       title?: string;
       "first-release-date"?: string;
+      "primary-type"?: string;
+      "secondary-types"?: string[];
       "artist-credit"?: Array<{ name?: string }>;
     }>;
   };
 
-  const results = (data["release-groups"] ?? []).map((rg) => {
-    const date = rg["first-release-date"];
-    const year = date ? Number.parseInt(date.slice(0, 4), 10) : null;
-    return {
-      sourceId: rg.id,
-      title: rg.title ?? "Untitled",
-      artist: rg["artist-credit"]?.[0]?.name ?? null,
-      year: Number.isFinite(year) ? year : null,
-      // Cover Art Archive front cover for this album (may 404 — the Cover
-      // component falls back to a tinted tile if so).
-      coverUrl: `https://coverartarchive.org/release-group/${rg.id}/front-250`,
-    };
-  });
+  // Exclude podcasts / spoken-word releases — keep it to actual music.
+  const EXCLUDE_SECONDARY = new Set([
+    "Audiobook",
+    "Audio drama",
+    "Interview",
+    "Spokenword",
+  ]);
 
-  return dedupeBy(results, (a) => `${a.title}|${a.artist ?? ""}`);
+  const candidates = (data["release-groups"] ?? [])
+    .filter((rg) => {
+      if (rg["primary-type"] === "Broadcast") return false; // radio/podcasts
+      const sec = rg["secondary-types"] ?? [];
+      return !sec.some((s) => EXCLUDE_SECONDARY.has(s));
+    })
+    .map((rg) => {
+      const date = rg["first-release-date"];
+      const year = date ? Number.parseInt(date.slice(0, 4), 10) : null;
+      return {
+        sourceId: rg.id,
+        title: rg.title ?? "Untitled",
+        artist: rg["artist-credit"]?.[0]?.name ?? null,
+        year: Number.isFinite(year) ? year : null,
+        coverUrl: `https://coverartarchive.org/release-group/${rg.id}/front-250`,
+      };
+    });
+
+  const deduped = dedupeBy(candidates, (a) => `${a.title}|${a.artist ?? ""}`);
+
+  // Only keep albums that actually have cover art (the CAA URL can 404).
+  const checked = await Promise.all(
+    deduped.map(async (a) => ({ a, ok: await hasCoverArt(a.sourceId) })),
+  );
+  return checked.filter((x) => x.ok).map((x) => x.a);
+}
+
+// Does this release group actually have front cover art?
+async function hasCoverArt(rgId: string): Promise<boolean> {
+  try {
+    const res = await fetch(
+      `https://coverartarchive.org/release-group/${rgId}/front-250`,
+      { method: "HEAD", redirect: "follow", next: { revalidate: 86400 } },
+    );
+    return res.ok;
+  } catch {
+    return false;
+  }
 }
 
 // Full details for one album (release group).
