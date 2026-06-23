@@ -126,23 +126,23 @@ export async function getOpenLibraryAuthor(
     : { entries: [] };
 
   const name = info.name ?? "Unknown author";
+  // Only keep works that have a real cover. Open Library frequently conflates
+  // different people with the same name into one author record; the junk/spam
+  // entries almost never have covers, so this filters them out.
   const works: PersonWork[] = (worksData.entries ?? [])
-    .filter((e) => e.key)
-    .map((e) => {
-      const cover = (e.covers ?? []).find((c) => c > 0);
-      return {
-        mediaType: "book",
-        source: "open_library",
-        sourceId: String(e.key).replace("/works/", ""),
-        title: e.title ?? "Untitled",
-        year: null,
-        coverUrl: cover
-          ? `https://covers.openlibrary.org/b/id/${cover}-M.jpg`
-          : null,
-        role: null,
-        creator: name,
-      };
-    });
+    .map((e) => ({ e, cover: (e.covers ?? []).find((c) => c > 0) }))
+    .filter((x) => x.e.key && x.cover)
+    .slice(0, 24)
+    .map(({ e, cover }) => ({
+      mediaType: "book",
+      source: "open_library",
+      sourceId: String(e.key).replace("/works/", ""),
+      title: e.title ?? "Untitled",
+      year: null,
+      coverUrl: `https://covers.openlibrary.org/b/id/${cover}-M.jpg`,
+      role: null,
+      creator: name,
+    }));
 
   const bio =
     typeof info.bio === "string" ? info.bio : info.bio?.value ?? null;
