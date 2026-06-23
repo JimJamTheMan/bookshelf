@@ -11,6 +11,12 @@ import { getArtDetails } from "./wikimedia";
 export type MediaDetails = {
   description: string | null;
   facts: { label: string; value: string }[];
+  // Richer fields, mainly for films/TV (Letterboxd-style layout):
+  backdropUrl?: string | null;
+  tagline?: string | null;
+  genres?: string[];
+  cast?: { name: string; character: string | null }[];
+  releases?: { region: string; date: string; cert: string | null }[];
 };
 
 export async function fetchMediaDetails(

@@ -19,6 +19,13 @@ const SEARCH_PATH: Record<string, string> = {
   music: "/music", game: "/games", art: "/art",
 };
 
+const REGION_NAMES: Record<string, string> = {
+  US: "USA", GB: "UK", FR: "France", DE: "Germany", IT: "Italy",
+  ES: "Spain", JP: "Japan", CA: "Canada", AU: "Australia", IE: "Ireland",
+  NZ: "New Zealand", IN: "India", BR: "Brazil", MX: "Mexico", RU: "Russia",
+  KR: "South Korea", CN: "China", NL: "Netherlands", SE: "Sweden",
+};
+
 type Author = { id: string; handle: string; display_name: string | null };
 
 function formatDate(iso: string): string {
@@ -47,7 +54,6 @@ export default async function MediaPage({
 
   const color = MEDIA_COLOR[media.media_type] ?? "#888";
 
-  // Pull richer info straight from the original source (cached for a day).
   const details = await fetchMediaDetails(
     media.media_type,
     media.source,
@@ -55,12 +61,16 @@ export default async function MediaPage({
   );
   const description = details?.description || media.description || null;
   const facts = details?.facts ?? [];
+  const genres = details?.genres ?? [];
+  const cast = details?.cast ?? [];
+  const releases = details?.releases ?? [];
+  const backdropUrl = details?.backdropUrl ?? null;
+  const tagline = details?.tagline ?? null;
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // The current user's own log for this item (if any).
   let myLog: { status: string; rating: number | null } | null = null;
   if (user) {
     const { data } = await supabase
@@ -72,7 +82,6 @@ export default async function MediaPage({
     myLog = data;
   }
 
-  // Everyone's written reviews for this item.
   const { data: reviewsRaw } = await supabase
     .from("logs")
     .select("id, user_id, rating, review, created_at")
@@ -93,77 +102,123 @@ export default async function MediaPage({
   }
 
   const avg = media.avg_rating != null ? Number(media.avg_rating) : null;
+  const logBtn = user ? (
+    <Link
+      href={`/log/${media.id}`}
+      className="inline-block rounded bg-[#f5f3ee] px-4 py-2 text-sm font-medium text-[#15130f] hover:bg-white"
+    >
+      {myLog ? "Edit your log" : "Log this"}
+    </Link>
+  ) : (
+    <Link
+      href="/login"
+      className="inline-block rounded bg-[#f5f3ee] px-4 py-2 text-sm font-medium text-[#15130f] hover:bg-white"
+    >
+      Log in to add this
+    </Link>
+  );
+
+  const titleBlock = (
+    <div className="min-w-0 flex-1">
+      <span
+        className="inline-block rounded px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide"
+        style={{ background: `${color}22`, color }}
+      >
+        {MEDIA_LABEL[media.media_type] ?? media.media_type}
+      </span>
+      <h1 className="mt-2 text-2xl font-semibold leading-tight tracking-tight">
+        {media.title}
+        {media.release_year && (
+          <span className="font-normal text-white/40"> ({media.release_year})</span>
+        )}
+      </h1>
+      {media.creator && (
+        <p className="mt-1 text-sm text-white/50">{media.creator}</p>
+      )}
+      {tagline && (
+        <p className="mt-2 text-sm italic text-white/50">“{tagline}”</p>
+      )}
+      <div className="mt-3 flex items-center gap-4 text-sm">
+        {avg != null ? (
+          <span className="text-[#f5d56b]">{(avg / 2).toFixed(1)}/5 ★</span>
+        ) : (
+          <span className="text-white/40">No ratings yet</span>
+        )}
+        <span className="text-white/40">
+          {media.log_count ?? 0} log{(media.log_count ?? 0) === 1 ? "" : "s"}
+        </span>
+      </div>
+      <div className="mt-4">{logBtn}</div>
+    </div>
+  );
+
+  const poster = (
+    <div className="flex w-32 shrink-0 self-start overflow-hidden rounded border border-white/10">
+      <div className="w-1.5 shrink-0" style={{ background: color }} />
+      <div className="aspect-[2/3] flex-1 bg-black/30">
+        <Cover src={media.cover_url} title={media.title} color={color} />
+      </div>
+    </div>
+  );
 
   return (
-    <main className="min-h-screen bg-[#15130f] text-[#f5f3ee] p-8">
-      <div className="mx-auto max-w-3xl">
-        <Link
-          href={SEARCH_PATH[media.media_type] ?? "/"}
-          className="text-sm text-white/50 hover:text-white/80"
-        >
-          ← Back to search
-        </Link>
-
-        {/* Header */}
-        <div className="mt-4 flex gap-6">
-          <div className="flex w-32 shrink-0 self-start overflow-hidden rounded border border-white/10">
-            <div className="w-1.5 shrink-0" style={{ background: color }} />
-            <div className="aspect-[2/3] flex-1 bg-black/30">
-              <Cover src={media.cover_url} title={media.title} color={color} />
-            </div>
+    <main className="min-h-screen bg-[#15130f] text-[#f5f3ee]">
+      {/* Hero */}
+      {backdropUrl ? (
+        <div className="relative">
+          <div className="absolute inset-0 overflow-hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={backdropUrl}
+              alt=""
+              className="h-full w-full object-cover opacity-25"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#15130f] via-[#15130f]/80 to-[#15130f]/40" />
           </div>
-
-          <div className="min-w-0 flex-1">
-            <span
-              className="inline-block rounded px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide"
-              style={{ background: `${color}22`, color }}
+          <div className="relative mx-auto max-w-3xl px-8 pb-6 pt-6">
+            <Link
+              href={SEARCH_PATH[media.media_type] ?? "/"}
+              className="text-sm text-white/60 hover:text-white"
             >
-              {MEDIA_LABEL[media.media_type] ?? media.media_type}
-            </span>
-            <h1 className="mt-2 text-2xl font-semibold leading-tight tracking-tight">
-              {media.title}
-            </h1>
-            <p className="mt-1 text-sm text-white/50">
-              {media.creator ?? ""}
-              {media.creator && media.release_year ? " · " : ""}
-              {media.release_year ?? ""}
-            </p>
-
-            <div className="mt-3 flex items-center gap-4 text-sm">
-              {avg != null ? (
-                <span className="text-[#f5d56b]">
-                  {(avg / 2).toFixed(1)}/5 ★
-                </span>
-              ) : (
-                <span className="text-white/40">No ratings yet</span>
-              )}
-              <span className="text-white/40">
-                {media.log_count ?? 0} log{(media.log_count ?? 0) === 1 ? "" : "s"}
-              </span>
-            </div>
-
-            <div className="mt-4">
-              {user ? (
-                <Link
-                  href={`/log/${media.id}`}
-                  className="inline-block rounded bg-[#f5f3ee] px-4 py-2 text-sm font-medium text-[#15130f] hover:bg-white"
-                >
-                  {myLog ? "Edit your log" : "Log this"}
-                </Link>
-              ) : (
-                <Link
-                  href="/login"
-                  className="inline-block rounded bg-[#f5f3ee] px-4 py-2 text-sm font-medium text-[#15130f] hover:bg-white"
-                >
-                  Log in to add this
-                </Link>
-              )}
+              ← Back to search
+            </Link>
+            <div className="mt-16 flex items-end gap-6">
+              {poster}
+              {titleBlock}
             </div>
           </div>
         </div>
+      ) : (
+        <div className="mx-auto max-w-3xl px-8 pt-6">
+          <Link
+            href={SEARCH_PATH[media.media_type] ?? "/"}
+            className="text-sm text-white/50 hover:text-white/80"
+          >
+            ← Back to search
+          </Link>
+          <div className="mt-4 flex gap-6">
+            {poster}
+            {titleBlock}
+          </div>
+        </div>
+      )}
+
+      <div className="mx-auto max-w-3xl px-8 pb-12">
+        {genres.length > 0 && (
+          <div className="mt-6 flex flex-wrap gap-2">
+            {genres.map((g) => (
+              <span
+                key={g}
+                className="rounded-full border border-white/15 px-3 py-1 text-xs text-white/70"
+              >
+                {g}
+              </span>
+            ))}
+          </div>
+        )}
 
         {description && (
-          <p className="mt-6 whitespace-pre-wrap text-sm leading-relaxed text-white/80">
+          <p className="mt-6 max-w-prose whitespace-pre-wrap text-sm leading-relaxed text-white/80">
             {description}
           </p>
         )}
@@ -177,6 +232,55 @@ export default async function MediaPage({
               </div>
             ))}
           </dl>
+        )}
+
+        {cast.length > 0 && (
+          <section className="mt-8">
+            <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
+              Cast
+            </h2>
+            <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {cast.map((c) => (
+                <li
+                  key={`${c.name}-${c.character ?? ""}`}
+                  className="rounded border border-white/10 bg-black/20 px-3 py-2 text-sm"
+                >
+                  <span className="text-white/90">{c.name}</span>
+                  {c.character && (
+                    <span className="block text-xs text-white/40">
+                      {c.character}
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {releases.length > 0 && (
+          <section className="mt-8">
+            <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
+              Releases
+            </h2>
+            <ul className="mt-3 grid grid-cols-1 gap-x-8 gap-y-1 sm:grid-cols-2">
+              {releases.slice(0, 24).map((r) => (
+                <li
+                  key={`${r.region}-${r.date}`}
+                  className="flex items-center justify-between gap-2 border-b border-white/5 py-1 text-sm"
+                >
+                  <span className="text-white/70">
+                    {REGION_NAMES[r.region] ?? r.region}
+                    {r.cert ? (
+                      <span className="ml-2 rounded border border-white/15 px-1 text-[10px] text-white/40">
+                        {r.cert}
+                      </span>
+                    ) : null}
+                  </span>
+                  <span className="text-white/50">{formatDate(r.date)}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
         )}
 
         {/* Reviews */}

@@ -127,7 +127,9 @@ export async function searchTv(query: string): Promise<ScreenResult[]> {
   return searchScreen(query, "tv");
 }
 
-// Full details for one film or TV show (with credits).
+const BACKDROP_BASE = "https://image.tmdb.org/t/p/w1280";
+
+// Full details for one film or TV show (with credits + release dates for films).
 export async function getScreenDetails(
   mediaType: string,
   id: string,
@@ -136,7 +138,8 @@ export async function getScreenDetails(
   if (!token || token.startsWith("PASTE_")) return null;
 
   const isTv = mediaType === "tv";
-  const url = `https://api.themoviedb.org/3/${isTv ? "tv" : "movie"}/${id}?append_to_response=credits`;
+  const append = isTv ? "credits" : "credits,release_dates";
+  const url = `https://api.themoviedb.org/3/${isTv ? "tv" : "movie"}/${id}?append_to_response=${append}`;
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
     next: { revalidate: 86400 },
@@ -145,6 +148,8 @@ export async function getScreenDetails(
 
   const d = (await res.json()) as {
     overview?: string;
+    tagline?: string;
+    backdrop_path?: string | null;
     genres?: { name: string }[];
     runtime?: number;
     episode_run_time?: number[];
@@ -153,14 +158,21 @@ export async function getScreenDetails(
     vote_average?: number;
     credits?: {
       crew?: { job: string; name: string }[];
-      cast?: { name: string }[];
+      cast?: { name: string; character?: string }[];
+    };
+    release_dates?: {
+      results?: {
+        iso_3166_1: string;
+        release_dates?: {
+          certification?: string;
+          release_date?: string;
+          type?: number;
+        }[];
+      }[];
     };
   };
 
   const facts: { label: string; value: string }[] = [];
-  const genres = (d.genres ?? []).map((g) => g.name).join(", ");
-  if (genres) facts.push({ label: "Genres", value: genres });
-
   if (isTv) {
     if (d.number_of_seasons)
       facts.push({ label: "Seasons", value: String(d.number_of_seasons) });
@@ -173,11 +185,36 @@ export async function getScreenDetails(
     const director = (d.credits?.crew ?? []).find((c) => c.job === "Director")?.name;
     if (director) facts.push({ label: "Director", value: director });
   }
-
-  const cast = (d.credits?.cast ?? []).slice(0, 4).map((c) => c.name).join(", ");
-  if (cast) facts.push({ label: "Starring", value: cast });
   if (d.vote_average)
     facts.push({ label: "TMDb score", value: `${d.vote_average.toFixed(1)}/10` });
 
-  return { description: d.overview || null, facts };
+  const cast = (d.credits?.cast ?? []).slice(0, 12).map((c) => ({
+    name: c.name,
+    character: c.character || null,
+  }));
+
+  // Release dates by country (films): one primary date per country.
+  const releases = (d.release_dates?.results ?? [])
+    .map((r) => {
+      const list = r.release_dates ?? [];
+      const primary = list.find((x) => x.type === 3) ?? list[0]; // 3 = theatrical
+      if (!primary?.release_date) return null;
+      return {
+        region: r.iso_3166_1,
+        date: primary.release_date.slice(0, 10),
+        cert: primary.certification || null,
+      };
+    })
+    .filter((x): x is { region: string; date: string; cert: string | null } => !!x)
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  return {
+    description: d.overview || null,
+    facts,
+    backdropUrl: d.backdrop_path ? `${BACKDROP_BASE}${d.backdrop_path}` : null,
+    tagline: d.tagline || null,
+    genres: (d.genres ?? []).map((g) => g.name),
+    cast,
+    releases,
+  };
 }
