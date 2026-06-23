@@ -20,15 +20,14 @@ function yearFrom(date: string | undefined): number | null {
   return Number.isFinite(y) ? y : null;
 }
 
-async function tmdb(path: string, query: string) {
+async function tmdbGet(path: string, params: Record<string, string>) {
   const token = process.env.TMDB_READ_TOKEN;
   if (!token || token.startsWith("PASTE_")) {
     throw new Error("TMDB_READ_TOKEN is not set");
   }
 
   const url = new URL(`https://api.themoviedb.org/3${path}`);
-  url.searchParams.set("query", query);
-  url.searchParams.set("include_adult", "false");
+  for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
 
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
@@ -38,46 +37,94 @@ async function tmdb(path: string, query: string) {
   return res.json();
 }
 
-export async function searchMovies(query: string): Promise<ScreenResult[]> {
-  const data = (await tmdb("/search/movie", query)) as {
-    results?: Array<{
-      id: number;
-      title?: string;
-      release_date?: string;
-      poster_path?: string | null;
-      overview?: string;
-    }>;
-  };
-  const results = (data.results ?? []).map((m) => ({
-    sourceId: String(m.id),
-    title: m.title ?? "Untitled",
-    year: yearFrom(m.release_date),
-    coverUrl: m.poster_path ? `${IMG_BASE}${m.poster_path}` : null,
-    description: m.overview || null,
-  }));
+type RawWork = {
+  id: number;
+  title?: string; // movie
+  name?: string; // tv
+  release_date?: string; // movie
+  first_air_date?: string; // tv
+  poster_path?: string | null;
+  overview?: string;
+  popularity?: number;
+};
 
-  return dedupeBy(results, (m) => `${m.title}|${m.year ?? ""}`);
+function toScreenResult(w: RawWork, kind: "movie" | "tv"): ScreenResult {
+  return {
+    sourceId: String(w.id),
+    title: (kind === "movie" ? w.title : w.name) ?? "Untitled",
+    year: yearFrom(kind === "movie" ? w.release_date : w.first_air_date),
+    coverUrl: w.poster_path ? `${IMG_BASE}${w.poster_path}` : null,
+    description: w.overview || null,
+  };
+}
+
+// If the query looks like a person's name, return the films/shows they're
+// involved in (as cast or crew — so actors AND directors are covered).
+async function worksByPerson(
+  query: string,
+  kind: "movie" | "tv",
+): Promise<RawWork[]> {
+  try {
+    const people = (await tmdbGet("/search/person", {
+      query,
+      include_adult: "false",
+    })) as { results?: { id: number; name?: string }[] };
+
+    const top = (people.results ?? [])[0];
+    if (!top) return [];
+
+    // Only treat it as a person search if the query really matches the name.
+    const q = query.toLowerCase();
+    const name = (top.name ?? "").toLowerCase();
+    if (!name || (!name.includes(q) && !q.includes(name))) return [];
+
+    const credits = (await tmdbGet(
+      `/person/${top.id}/${kind === "movie" ? "movie_credits" : "tv_credits"}`,
+      {},
+    )) as { cast?: RawWork[]; crew?: RawWork[] };
+
+    const seen = new Set<number>();
+    const unique: RawWork[] = [];
+    for (const w of [...(credits.cast ?? []), ...(credits.crew ?? [])].sort(
+      (a, b) => (b.popularity ?? 0) - (a.popularity ?? 0),
+    )) {
+      if (seen.has(w.id)) continue;
+      seen.add(w.id);
+      unique.push(w);
+    }
+    return unique.slice(0, 20);
+  } catch {
+    return [];
+  }
+}
+
+async function searchScreen(
+  query: string,
+  kind: "movie" | "tv",
+): Promise<ScreenResult[]> {
+  const [byTitle, byPerson] = await Promise.all([
+    tmdbGet(`/search/${kind}`, { query, include_adult: "false" }) as Promise<{
+      results?: RawWork[];
+    }>,
+    worksByPerson(query, kind),
+  ]);
+
+  // Title matches first, then the person's works.
+  const merged = [
+    ...(byTitle.results ?? []).map((w) => toScreenResult(w, kind)),
+    ...byPerson.map((w) => toScreenResult(w, kind)),
+  ];
+
+  const byId = dedupeBy(merged, (m) => m.sourceId);
+  return dedupeBy(byId, (m) => `${m.title}|${m.year ?? ""}`).slice(0, 30);
+}
+
+export async function searchMovies(query: string): Promise<ScreenResult[]> {
+  return searchScreen(query, "movie");
 }
 
 export async function searchTv(query: string): Promise<ScreenResult[]> {
-  const data = (await tmdb("/search/tv", query)) as {
-    results?: Array<{
-      id: number;
-      name?: string;
-      first_air_date?: string;
-      poster_path?: string | null;
-      overview?: string;
-    }>;
-  };
-  const results = (data.results ?? []).map((t) => ({
-    sourceId: String(t.id),
-    title: t.name ?? "Untitled",
-    year: yearFrom(t.first_air_date),
-    coverUrl: t.poster_path ? `${IMG_BASE}${t.poster_path}` : null,
-    description: t.overview || null,
-  }));
-
-  return dedupeBy(results, (t) => `${t.title}|${t.year ?? ""}`);
+  return searchScreen(query, "tv");
 }
 
 // Full details for one film or TV show (with credits).
