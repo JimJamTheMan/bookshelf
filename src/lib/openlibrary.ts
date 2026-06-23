@@ -57,7 +57,10 @@ export async function searchBooks(query: string): Promise<BookResult[]> {
   const normalize = (t: string) =>
     t.replace(/[[(].*?[\])]/g, "").replace(/\s+/g, " ").trim();
 
-  return dedupeBy(results, (b) => `${normalize(b.title)}|${b.author ?? ""}`);
+  // Only show books that have a cover.
+  const withCovers = results.filter((b) => b.coverUrl);
+
+  return dedupeBy(withCovers, (b) => `${normalize(b.title)}|${b.author ?? ""}`);
 }
 
 // Full details for one book (work).

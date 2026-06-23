@@ -77,7 +77,10 @@ export async function searchArt(query: string): Promise<ArtResult[]> {
     };
   });
 
-  return dedupeBy(results, (a) => `${a.title}|${a.artist ?? ""}`);
+  // Only show artworks that actually have an image.
+  const withImages = results.filter((a) => a.coverUrl);
+
+  return dedupeBy(withImages, (a) => `${a.title}|${a.artist ?? ""}`);
 }
 
 // Full details for one artwork (by Commons page id).
