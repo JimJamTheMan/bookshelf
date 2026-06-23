@@ -63,9 +63,11 @@ export default async function MediaPage({
   const facts = details?.facts ?? [];
   const genres = details?.genres ?? [];
   const cast = details?.cast ?? [];
+  const crew = details?.crew ?? [];
   const releases = details?.releases ?? [];
   const backdropUrl = details?.backdropUrl ?? null;
   const tagline = details?.tagline ?? null;
+  const creatorLink = details?.creatorLink ?? null;
 
   const {
     data: { user },
@@ -133,7 +135,34 @@ export default async function MediaPage({
         )}
       </h1>
       {media.creator && (
-        <p className="mt-1 text-sm text-white/50">{media.creator}</p>
+        <p className="mt-1 text-sm text-white/50">
+          {creatorLink ? (
+            <Link
+              href={`/person/${creatorLink.source}/${encodeURIComponent(creatorLink.id)}`}
+              className="hover:underline"
+            >
+              {media.creator}
+            </Link>
+          ) : (
+            media.creator
+          )}
+        </p>
+      )}
+      {crew.length > 0 && (
+        <p className="mt-1 text-sm text-white/50">
+          {crew.map((c, i) => (
+            <span key={`${c.id}-${c.job}`}>
+              {i > 0 && ", "}
+              <Link
+                href={`/person/tmdb/${c.id}`}
+                className="hover:underline"
+              >
+                {c.name}
+              </Link>
+              <span className="text-white/30"> ({c.job})</span>
+            </span>
+          ))}
+        </p>
       )}
       {tagline && (
         <p className="mt-2 text-sm italic text-white/50">“{tagline}”</p>
@@ -245,7 +274,16 @@ export default async function MediaPage({
                   key={`${c.name}-${c.character ?? ""}`}
                   className="rounded border border-white/10 bg-black/20 px-3 py-2 text-sm"
                 >
-                  <span className="text-white/90">{c.name}</span>
+                  {c.id ? (
+                    <Link
+                      href={`/person/tmdb/${c.id}`}
+                      className="text-white/90 hover:underline"
+                    >
+                      {c.name}
+                    </Link>
+                  ) : (
+                    <span className="text-white/90">{c.name}</span>
+                  )}
                   {c.character && (
                     <span className="block text-xs text-white/40">
                       {c.character}

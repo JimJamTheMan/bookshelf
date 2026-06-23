@@ -1,5 +1,6 @@
 import { dedupeBy } from "./dedupe";
 import type { MediaDetails } from "./media-details";
+import type { Person, PersonWork } from "./people";
 
 // TMDb search for films and TV — called server-side only. Uses the v4 "API Read
 // Access Token" as a Bearer secret (TMDB_READ_TOKEN, never exposed to the browser).
@@ -157,8 +158,8 @@ export async function getScreenDetails(
     created_by?: { name: string }[];
     vote_average?: number;
     credits?: {
-      crew?: { job: string; name: string }[];
-      cast?: { name: string; character?: string }[];
+      crew?: { id: number; job: string; name: string }[];
+      cast?: { id: number; name: string; character?: string }[];
     };
     release_dates?: {
       results?: {
@@ -182,16 +183,28 @@ export async function getScreenDetails(
       facts.push({ label: "Episode length", value: `${d.episode_run_time[0]} min` });
   } else {
     if (d.runtime) facts.push({ label: "Runtime", value: `${d.runtime} min` });
-    const director = (d.credits?.crew ?? []).find((c) => c.job === "Director")?.name;
-    if (director) facts.push({ label: "Director", value: director });
   }
   if (d.vote_average)
     facts.push({ label: "TMDb score", value: `${d.vote_average.toFixed(1)}/10` });
 
   const cast = (d.credits?.cast ?? []).slice(0, 12).map((c) => ({
+    id: c.id ?? null,
     name: c.name,
     character: c.character || null,
   }));
+
+  // Key crew (directors + writers), linked to their person pages.
+  const crewSeen = new Set<string>();
+  const crew = (d.credits?.crew ?? [])
+    .filter((c) => ["Director", "Writer", "Screenplay", "Creator"].includes(c.job))
+    .filter((c) => {
+      const key = `${c.id}-${c.job}`;
+      if (crewSeen.has(key)) return false;
+      crewSeen.add(key);
+      return true;
+    })
+    .slice(0, 6)
+    .map((c) => ({ id: c.id, name: c.name, job: c.job }));
 
   // Release dates by country (films): one primary date per country.
   const releases = (d.release_dates?.results ?? [])
@@ -215,6 +228,59 @@ export async function getScreenDetails(
     tagline: d.tagline || null,
     genres: (d.genres ?? []).map((g) => g.name),
     cast,
+    crew,
     releases,
+  };
+}
+
+const PROFILE_BASE = "https://image.tmdb.org/t/p/w185";
+
+// A person (actor/director/writer) and everything they're credited on.
+export async function getTmdbPerson(id: string): Promise<Person | null> {
+  const data = (await tmdbGet(`/person/${id}`, {
+    append_to_response: "combined_credits",
+  })) as {
+    name?: string;
+    biography?: string;
+    profile_path?: string | null;
+    known_for_department?: string;
+    combined_credits?: {
+      cast?: RawWork[];
+      crew?: (RawWork & { job?: string })[];
+    };
+  };
+  if (!data.name) return null;
+
+  const credits = [
+    ...(data.combined_credits?.cast ?? []),
+    ...(data.combined_credits?.crew ?? []),
+  ] as (RawWork & { media_type?: string; character?: string; job?: string })[];
+
+  const seen = new Set<string>();
+  const works: PersonWork[] = [];
+  for (const w of credits.sort(
+    (a, b) => (b.popularity ?? 0) - (a.popularity ?? 0),
+  )) {
+    const isTv = w.media_type === "tv";
+    const key = `${w.media_type}-${w.id}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    works.push({
+      mediaType: isTv ? "tv" : "film",
+      source: "tmdb",
+      sourceId: String(w.id),
+      title: (isTv ? w.name : w.title) ?? "Untitled",
+      year: yearFrom(isTv ? w.first_air_date : w.release_date),
+      coverUrl: w.poster_path ? `${IMG_BASE}${w.poster_path}` : null,
+      role: w.character || w.job || null,
+    });
+  }
+
+  return {
+    name: data.name,
+    subtitle: data.known_for_department ?? null,
+    photoUrl: data.profile_path ? `${PROFILE_BASE}${data.profile_path}` : null,
+    bio: data.biography || null,
+    works: works.slice(0, 48),
   };
 }

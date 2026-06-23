@@ -1,5 +1,8 @@
 import { dedupeBy } from "./dedupe";
 import type { MediaDetails } from "./media-details";
+import type { Person, PersonWork } from "./people";
+
+const UA = "Bookshelf/0.1 (dev contact: jamesflower1994@gmail.com)";
 
 // Music search via MusicBrainz (metadata) + Cover Art Archive (covers).
 // Server-side only. MusicBrainz requires a descriptive User-Agent and limits to
@@ -67,7 +70,7 @@ export async function getMusicDetails(
   if (!res.ok) return null;
 
   const d = (await res.json()) as {
-    "artist-credit"?: { name?: string }[];
+    "artist-credit"?: { name?: string; artist?: { id?: string } }[];
     "primary-type"?: string;
     "first-release-date"?: string;
     tags?: { name: string; count?: number }[];
@@ -89,5 +92,57 @@ export async function getMusicDetails(
     .join(", ");
   if (tags) facts.push({ label: "Tags", value: tags });
 
-  return { description: null, facts };
+  const artistId = d["artist-credit"]?.[0]?.artist?.id ?? null;
+
+  return {
+    description: null,
+    facts,
+    creatorLink: artistId ? { source: "musicbrainz", id: artistId } : null,
+  };
+}
+
+// A music artist/band and their discography (release groups = albums/EPs).
+export async function getMusicArtist(mbid: string): Promise<Person | null> {
+  const url = `https://musicbrainz.org/ws/2/artist/${mbid}?inc=release-groups&fmt=json`;
+  const res = await fetch(url, {
+    headers: { "User-Agent": UA },
+    next: { revalidate: 86400 },
+  });
+  if (!res.ok) return null;
+
+  const d = (await res.json()) as {
+    name?: string;
+    type?: string;
+    "release-groups"?: {
+      id: string;
+      title?: string;
+      "first-release-date"?: string;
+      "primary-type"?: string;
+    }[];
+  };
+  if (!d.name) return null;
+
+  const works: PersonWork[] = (d["release-groups"] ?? [])
+    .map((rg) => {
+      const date = rg["first-release-date"];
+      const year = date ? Number.parseInt(date.slice(0, 4), 10) : null;
+      return {
+        mediaType: "music",
+        source: "musicbrainz",
+        sourceId: rg.id,
+        title: rg.title ?? "Untitled",
+        year: Number.isFinite(year) ? year : null,
+        coverUrl: `https://coverartarchive.org/release-group/${rg.id}/front-250`,
+        role: rg["primary-type"] ?? null,
+      };
+    })
+    .sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
+
+  return {
+    name: d.name,
+    subtitle: d.type ?? "Artist",
+    photoUrl: null, // MusicBrainz has no artist images
+    bio: null,
+    works,
+  };
 }

@@ -15,8 +15,11 @@ export type MediaDetails = {
   backdropUrl?: string | null;
   tagline?: string | null;
   genres?: string[];
-  cast?: { name: string; character: string | null }[];
+  cast?: { id: number | null; name: string; character: string | null }[];
+  crew?: { id: number; name: string; job: string }[];
   releases?: { region: string; date: string; cert: string | null }[];
+  // For music: link the album's artist to their person page.
+  creatorLink?: { source: string; id: string } | null;
 };
 
 export async function fetchMediaDetails(
