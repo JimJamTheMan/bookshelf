@@ -63,9 +63,37 @@ export async function searchBooks(query: string): Promise<BookResult[]> {
   return dedupeBy(withCovers, (b) => `${normalize(b.title)}|${b.author ?? ""}`);
 }
 
-// Full details for one book (work).
+// Google Books usually has a real summary when Open Library doesn't. No key needed.
+async function googleBooksDescription(
+  title: string,
+  author?: string | null,
+): Promise<string | null> {
+  try {
+    const q =
+      `intitle:${title}` + (author ? ` inauthor:${author}` : "");
+    const res = await fetch(
+      `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=5`,
+      { next: { revalidate: 86400 } },
+    );
+    if (!res.ok) return null;
+    const data = (await res.json()) as {
+      items?: { volumeInfo?: { description?: string } }[];
+    };
+    for (const item of data.items ?? []) {
+      const desc = item.volumeInfo?.description;
+      if (desc) return desc.replace(/<[^>]*>/g, "").trim(); // strip any HTML
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+// Full details for one book (work). Falls back to Google Books for a summary.
 export async function getBookDetails(
   workId: string,
+  title?: string,
+  creator?: string | null,
 ): Promise<MediaDetails | null> {
   const res = await fetch(`https://openlibrary.org/works/${workId}.json`, {
     headers: { "User-Agent": "Bookshelf/0.1 (jamesflower1994@gmail.com)" },
@@ -74,6 +102,7 @@ export async function getBookDetails(
   if (!res.ok) return null;
 
   const d = (await res.json()) as {
+    title?: string;
     description?: string | { value?: string };
     subjects?: string[];
     authors?: { author?: { key?: string } }[];
@@ -82,6 +111,11 @@ export async function getBookDetails(
   let description: string | null = null;
   if (typeof d.description === "string") description = d.description;
   else if (d.description?.value) description = d.description.value;
+
+  // Open Library often has no description — fall back to Google Books.
+  if (!description) {
+    description = await googleBooksDescription(title || d.title || "", creator);
+  }
 
   const facts: { label: string; value: string }[] = [];
   if (Array.isArray(d.subjects) && d.subjects.length) {

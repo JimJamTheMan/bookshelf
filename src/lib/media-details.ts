@@ -28,11 +28,12 @@ export async function fetchMediaDetails(
   mediaType: string,
   source: string,
   sourceId: string,
+  meta?: { title?: string; creator?: string | null },
 ): Promise<MediaDetails | null> {
   try {
     switch (source) {
       case "open_library":
-        return await getBookDetails(sourceId);
+        return await getBookDetails(sourceId, meta?.title, meta?.creator);
       case "tmdb":
         return await getScreenDetails(mediaType, sourceId);
       case "igdb":

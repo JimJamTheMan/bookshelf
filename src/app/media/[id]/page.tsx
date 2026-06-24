@@ -58,6 +58,7 @@ export default async function MediaPage({
     media.media_type,
     media.source,
     media.source_id,
+    { title: media.title, creator: media.creator },
   );
   const description = details?.description || media.description || null;
   const facts = details?.facts ?? [];
