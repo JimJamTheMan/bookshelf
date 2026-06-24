@@ -139,10 +139,12 @@ export type TrendingItem = {
   description: string | null;
 };
 
-// What's popular this week (films + TV), live from TMDb.
-export async function getTrending(): Promise<TrendingItem[]> {
+// What's popular this week (films + TV), live from TMDb. Paginated.
+export async function getTrending(page = 1): Promise<TrendingItem[]> {
   try {
-    const data = (await tmdbGet("/trending/all/week", {})) as {
+    const data = (await tmdbGet("/trending/all/week", {
+      page: String(page),
+    })) as {
       results?: (RawWork & { media_type?: string })[];
     };
     return (data.results ?? [])

@@ -2,9 +2,9 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Cover } from "../_components/Cover";
 import { displayTitle } from "@/lib/format";
-import { openMedia } from "@/app/media-actions";
-import { getTrending, type TrendingItem } from "@/lib/tmdb";
+import { getTrending } from "@/lib/tmdb";
 import { getRecommendations } from "@/lib/recommendations";
+import { TrendingFeed } from "./TrendingFeed";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A", film: "#D94F4F", tv: "#4F7ED9",
@@ -45,38 +45,6 @@ function MediaGrid({ items }: { items: Media[] }) {
             {displayTitle(m.title, m.release_year, m.media_type)}
           </p>
           <p className="text-xs text-white/50">{m.creator ?? ""}</p>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-// Grid of items not yet in our catalogue (cache on click, then open detail).
-function TrendingGrid({ items }: { items: TrendingItem[] }) {
-  return (
-    <ul className="mt-4 grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-      {items.map((m) => (
-        <li key={`${m.mediaType}-${m.sourceId}`}>
-          <form action={openMedia}>
-            <input type="hidden" name="media_type" value={m.mediaType} />
-            <input type="hidden" name="source" value={m.source} />
-            <input type="hidden" name="source_id" value={m.sourceId} />
-            <input type="hidden" name="title" value={m.title} />
-            <input type="hidden" name="release_year" value={m.year ?? ""} />
-            <input type="hidden" name="cover_url" value={m.coverUrl ?? ""} />
-            <input type="hidden" name="description" value={m.description ?? ""} />
-            <button type="submit" className="block w-full text-left">
-              <div className="flex overflow-hidden rounded border border-white/10">
-                <div className="w-1 shrink-0" style={{ background: MEDIA_COLOR[m.mediaType] ?? "#888" }} />
-                <div className="aspect-[2/3] flex-1 bg-black/30">
-                  <Cover src={m.coverUrl} title={m.title} color={MEDIA_COLOR[m.mediaType] ?? "#888"} />
-                </div>
-              </div>
-              <p className="mt-2 line-clamp-2 text-sm font-medium leading-tight">
-                {displayTitle(m.title, m.year, m.mediaType)}
-              </p>
-            </button>
-          </form>
         </li>
       ))}
     </ul>
@@ -186,20 +154,7 @@ export default async function DiscoverPage({
         </section>
       )}
 
-      <section className="mt-10">
-        <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
-          Popular this week
-        </h2>
-        {trending.length > 0 ? (
-          <TrendingGrid items={trending} />
-        ) : (
-          <p className="mt-3 text-sm text-white/50">
-            Couldn&apos;t load trending right now.
-          </p>
-        )}
-      </section>
-
-      <section className="mt-10">
+      <section className="mt-8">
         <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
           People to follow
         </h2>
@@ -207,6 +162,19 @@ export default async function DiscoverPage({
           <PeopleList people={people} />
         ) : (
           <p className="mt-3 text-sm text-white/50">No people yet.</p>
+        )}
+      </section>
+
+      <section className="mt-10">
+        <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
+          Popular this week
+        </h2>
+        {trending.length > 0 ? (
+          <TrendingFeed initial={trending} />
+        ) : (
+          <p className="mt-3 text-sm text-white/50">
+            Couldn&apos;t load trending right now.
+          </p>
         )}
       </section>
     </DiscoverShell>
