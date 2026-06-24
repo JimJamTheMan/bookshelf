@@ -2,6 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Cover } from "../../_components/Cover";
+import { starsFromRating } from "@/lib/stars";
+import { statusLabel } from "@/lib/status";
+import { displayTitle } from "@/lib/format";
 import { follow, unfollow } from "./actions";
 
 const MEDIA_COLOR: Record<string, string> = {
@@ -14,6 +17,18 @@ type FeaturedItem = {
   title: string;
   cover_url: string | null;
   media_type: string;
+};
+
+type ShelfRow = {
+  status: string;
+  rating: number | null;
+  media: {
+    id: string;
+    title: string;
+    release_year: number | null;
+    cover_url: string | null;
+    media_type: string;
+  } | null;
 };
 
 // Public, read-only view of any user's profile by their handle.
@@ -87,6 +102,17 @@ export default async function PublicProfilePage({
     visibility: string;
     item_count: number | null;
   }[];
+
+  // This user's shelf — everything they've logged, newest first.
+  const { data: shelfData } = await supabase
+    .from("logs")
+    .select(
+      "status, rating, media:media_items(id, title, release_year, cover_url, media_type)",
+    )
+    .eq("user_id", profile.id)
+    .order("created_at", { ascending: false })
+    .limit(24);
+  const shelf = (shelfData ?? []) as unknown as ShelfRow[];
 
   return (
     <main className="min-h-screen bg-[#15130f] text-[#f5f3ee] flex items-center justify-center p-8">
@@ -184,6 +210,51 @@ export default async function PublicProfilePage({
             following
           </span>
         </div>
+
+        {shelf.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-xs font-medium uppercase tracking-wide text-white/40">
+              Shelf
+            </h2>
+            <ul className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4">
+              {shelf.map((row, i) =>
+                row.media ? (
+                  <li key={`${row.media.id}-${i}`}>
+                    <Link href={`/media/${row.media.id}`}>
+                      <div className="flex overflow-hidden rounded border border-white/10">
+                        <div
+                          className="w-1 shrink-0"
+                          style={{
+                            background:
+                              MEDIA_COLOR[row.media.media_type] ?? "#888",
+                          }}
+                        />
+                        <div className="aspect-[2/3] flex-1 bg-black/30">
+                          <Cover
+                            src={row.media.cover_url}
+                            title={row.media.title}
+                            color={MEDIA_COLOR[row.media.media_type] ?? "#888"}
+                          />
+                        </div>
+                      </div>
+                    </Link>
+                    <p className="mt-1 line-clamp-1 text-xs font-medium leading-tight">
+                      {displayTitle(
+                        row.media.title,
+                        row.media.release_year,
+                        row.media.media_type,
+                      )}
+                    </p>
+                    <p className="text-[11px] text-white/40">
+                      {statusLabel(row.media.media_type, row.status)}
+                      {row.rating ? ` · ${starsFromRating(row.rating)}` : ""}
+                    </p>
+                  </li>
+                ) : null,
+              )}
+            </ul>
+          </div>
+        )}
 
         {featured.length > 0 && (
           <div className="mt-8">
