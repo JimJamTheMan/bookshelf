@@ -8,7 +8,11 @@ import {
   getTmdbWikidataId,
 } from "./tmdb";
 import { getMusicArtist, getMusicbrainzWikidataId } from "./musicbrainz";
-import { getOpenLibraryAuthor, findOpenLibraryAuthorId } from "./openlibrary";
+import {
+  getOpenLibraryAuthor,
+  findOpenLibraryAuthorId,
+  getOpenLibraryWikidataId,
+} from "./openlibrary";
 import { crossIdsFromWikidata } from "./wikidata";
 
 export type PersonWork = {
@@ -70,7 +74,10 @@ export async function fetchPerson(
       ]);
     } else if (source === "open_library") {
       ids.openLibraryAuthor = id;
-      base = await getOpenLibraryAuthor(id);
+      [base, qid] = await Promise.all([
+        getOpenLibraryAuthor(id),
+        getOpenLibraryWikidataId(id),
+      ]);
     }
 
     if (!base) return null;
@@ -109,11 +116,17 @@ export async function fetchPerson(
       ...(musicExtra?.works ?? []),
       ...(bookExtra?.works ?? []),
     ];
+    const norm = (t: string) => t.toLowerCase().replace(/\s+/g, " ").trim();
     const seen = new Set<string>();
+    const seenTitle = new Set<string>();
     const works = merged.filter((w) => {
       const k = `${w.source}-${w.sourceId}`;
       if (seen.has(k)) return false;
       seen.add(k);
+      // Also drop repeats of the same title/year within a medium (different ids).
+      const tk = `${w.mediaType}|${norm(w.title)}|${w.year ?? ""}`;
+      if (seenTitle.has(tk)) return false;
+      seenTitle.add(tk);
       return true;
     });
 

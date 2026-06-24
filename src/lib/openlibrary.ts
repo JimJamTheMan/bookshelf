@@ -126,6 +126,23 @@ export async function findOpenLibraryAuthorId(
   }
 }
 
+// The author's Wikidata id (so an author page can become cross-media), or null.
+export async function getOpenLibraryWikidataId(
+  authorId: string,
+): Promise<string | null> {
+  try {
+    const res = await fetch(`https://openlibrary.org/authors/${authorId}.json`, {
+      headers: { "User-Agent": "Bookshelf/0.1 (jamesflower1994@gmail.com)" },
+      next: { revalidate: 86400 },
+    });
+    if (!res.ok) return null;
+    const d = (await res.json()) as { remote_ids?: { wikidata?: string } };
+    return d.remote_ids?.wikidata || null;
+  } catch {
+    return null;
+  }
+}
+
 // An author and the books they've written (Open Library author OLID, e.g. OL23919A).
 export async function getOpenLibraryAuthor(
   authorId: string,
@@ -133,15 +150,16 @@ export async function getOpenLibraryAuthor(
   const headers = {
     "User-Agent": "Bookshelf/0.1 (jamesflower1994@gmail.com)",
   };
-  const [infoRes, worksRes] = await Promise.all([
+  const [infoRes, searchRes] = await Promise.all([
     fetch(`https://openlibrary.org/authors/${authorId}.json`, {
       headers,
       next: { revalidate: 86400 },
     }),
-    fetch(`https://openlibrary.org/authors/${authorId}/works.json?limit=48`, {
-      headers,
-      next: { revalidate: 86400 },
-    }),
+    // English works with covers, via the search API (so translations are excluded).
+    fetch(
+      `https://openlibrary.org/search.json?author_key=${authorId}&language=eng&fields=key,title,cover_i,first_publish_year&limit=60`,
+      { headers, next: { revalidate: 86400 } },
+    ),
   ]);
   if (!infoRes.ok) return null;
 
@@ -149,30 +167,39 @@ export async function getOpenLibraryAuthor(
     name?: string;
     bio?: string | { value?: string };
   };
-  const worksData = worksRes.ok
-    ? ((await worksRes.json()) as {
-        entries?: { title?: string; key?: string; covers?: number[] }[];
+  const searchData = searchRes.ok
+    ? ((await searchRes.json()) as {
+        docs?: {
+          key?: string;
+          title?: string;
+          cover_i?: number;
+          first_publish_year?: number;
+        }[];
       })
-    : { entries: [] };
+    : { docs: [] };
 
   const name = info.name ?? "Unknown author";
-  // Only keep works that have a real cover. Open Library frequently conflates
-  // different people with the same name into one author record; the junk/spam
-  // entries almost never have covers, so this filters them out.
-  const works: PersonWork[] = (worksData.entries ?? [])
-    .map((e) => ({ e, cover: (e.covers ?? []).find((c) => c > 0) }))
-    .filter((x) => x.e.key && x.cover)
-    .slice(0, 24)
-    .map(({ e, cover }) => ({
+  const norm = (t: string) => t.toLowerCase().replace(/\s+/g, " ").trim();
+  const seenTitle = new Set<string>();
+  const works: PersonWork[] = [];
+  for (const d of searchData.docs ?? []) {
+    if (!d.key || !d.cover_i) continue; // cover required (drops spam)
+    if (/^title tba\b/i.test(d.title ?? "")) continue; // OL placeholder works
+    const titleKey = norm(d.title ?? "");
+    if (seenTitle.has(titleKey)) continue; // drop duplicate work records
+    seenTitle.add(titleKey);
+    works.push({
       mediaType: "book",
       source: "open_library",
-      sourceId: String(e.key).replace("/works/", ""),
-      title: e.title ?? "Untitled",
-      year: null,
-      coverUrl: `https://covers.openlibrary.org/b/id/${cover}-M.jpg`,
+      sourceId: String(d.key).replace("/works/", ""),
+      title: d.title ?? "Untitled",
+      year: d.first_publish_year ?? null,
+      coverUrl: `https://covers.openlibrary.org/b/id/${d.cover_i}-M.jpg`,
       role: null,
       creator: name,
-    }));
+    });
+    if (works.length >= 24) break;
+  }
 
   const bio =
     typeof info.bio === "string" ? info.bio : info.bio?.value ?? null;
