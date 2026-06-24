@@ -1,6 +1,7 @@
 import { dedupeBy } from "./dedupe";
 import type { MediaDetails } from "./media-details";
 import type { Person, PersonWork } from "./people";
+import { wikidataByProperty } from "./wikidata";
 
 // TMDb search for films and TV — called server-side only. Uses the v4 "API Read
 // Access Token" as a Bearer secret (TMDB_READ_TOKEN, never exposed to the browser).
@@ -233,16 +234,25 @@ export async function getScreenDetails(
   };
 }
 
-// The person's Wikidata id (for cross-media linking), or null.
+// The person's Wikidata id (for cross-media linking), or null. TMDb often omits
+// it, so fall back to looking the person up on Wikidata by their TMDb/IMDb id.
 export async function getTmdbWikidataId(id: string): Promise<string | null> {
+  let imdbId: string | null = null;
   try {
     const data = (await tmdbGet(`/person/${id}/external_ids`, {})) as {
       wikidata_id?: string | null;
+      imdb_id?: string | null;
     };
-    return data.wikidata_id || null;
+    if (data.wikidata_id) return data.wikidata_id;
+    imdbId = data.imdb_id || null;
   } catch {
-    return null;
+    // fall through to Wikidata lookups
   }
+
+  const byTmdb = await wikidataByProperty("P4985", id);
+  if (byTmdb) return byTmdb;
+  if (imdbId) return await wikidataByProperty("P345", imdbId);
+  return null;
 }
 
 const PROFILE_BASE = "https://image.tmdb.org/t/p/w185";
@@ -266,12 +276,20 @@ export async function getTmdbPerson(id: string): Promise<Person | null> {
   const credits = [
     ...(data.combined_credits?.cast ?? []),
     ...(data.combined_credits?.crew ?? []),
-  ] as (RawWork & { media_type?: string; character?: string; job?: string })[];
+  ] as (RawWork & {
+    media_type?: string;
+    character?: string;
+    job?: string;
+    episode_count?: number;
+  })[];
 
-  // Drop "as themselves" guest spots (talk shows, award shows, etc.) — they're
-  // not real roles and otherwise flood the list.
-  const isSelfAppearance = (character?: string) =>
-    !!character && /\b(self|himself|herself|themselves)\b/i.test(character);
+  // "as themselves" credits are usually one-off guest spots (talk shows, award
+  // shows) — drop those, BUT keep them when they span many episodes, because
+  // that means it's a real hosting/recurring role (e.g. a show's host).
+  const isThrowawaySelf = (character?: string, episodes?: number) =>
+    !!character &&
+    /\b(self|himself|herself|themselves)\b/i.test(character) &&
+    (episodes ?? 0) < 3;
 
   const films: PersonWork[] = [];
   const tv: PersonWork[] = [];
@@ -283,7 +301,7 @@ export async function getTmdbPerson(id: string): Promise<Person | null> {
     const key = `${w.media_type}-${w.id}`;
     if (seen.has(key)) continue;
     seen.add(key);
-    if (isSelfAppearance(w.character)) continue;
+    if (isThrowawaySelf(w.character, w.episode_count)) continue;
     const work: PersonWork = {
       mediaType: isTv ? "tv" : "film",
       source: "tmdb",

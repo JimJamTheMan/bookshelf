@@ -8,6 +8,35 @@ export type CrossIds = {
   openLibraryAuthor?: string; // P648   Open Library ID (author, ends in "A")
 };
 
+// Find a Wikidata entity by an external-id property (e.g. P4985 = TMDb person,
+// P345 = IMDb). Used as a fallback when a source doesn't give us the Wikidata id.
+export async function wikidataByProperty(
+  prop: string,
+  value: string,
+): Promise<string | null> {
+  try {
+    const sparql = `SELECT ?item WHERE { ?item wdt:${prop} "${value}" } LIMIT 1`;
+    const res = await fetch(
+      `https://query.wikidata.org/sparql?format=json&query=${encodeURIComponent(sparql)}`,
+      {
+        headers: {
+          Accept: "application/sparql-results+json",
+          "User-Agent": "Bookshelf/0.1 (jamesflower1994@gmail.com)",
+        },
+        next: { revalidate: 86400 },
+      },
+    );
+    if (!res.ok) return null;
+    const data = (await res.json()) as {
+      results?: { bindings?: { item?: { value?: string } }[] };
+    };
+    const uri = data.results?.bindings?.[0]?.item?.value;
+    return uri ? (uri.split("/").pop() ?? null) : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function crossIdsFromWikidata(qid: string): Promise<CrossIds> {
   const res = await fetch(
     `https://www.wikidata.org/wiki/Special:EntityData/${qid}.json`,

@@ -8,7 +8,7 @@ import {
   getTmdbWikidataId,
 } from "./tmdb";
 import { getMusicArtist, getMusicbrainzWikidataId } from "./musicbrainz";
-import { getOpenLibraryAuthor } from "./openlibrary";
+import { getOpenLibraryAuthor, findOpenLibraryAuthorId } from "./openlibrary";
 import { crossIdsFromWikidata } from "./wikidata";
 
 export type PersonWork = {
@@ -83,6 +83,12 @@ export async function fetchPerson(
         ids.musicbrainz = cross.musicbrainz;
       if (!ids.openLibraryAuthor && cross.openLibraryAuthor)
         ids.openLibraryAuthor = cross.openLibraryAuthor;
+    }
+
+    // If Wikidata had no Open Library link, try matching an author by name.
+    if (!ids.openLibraryAuthor && source !== "open_library") {
+      ids.openLibraryAuthor =
+        (await findOpenLibraryAuthorId(base.name)) ?? undefined;
     }
 
     // 3. Fetch works from the *other* sources in parallel.

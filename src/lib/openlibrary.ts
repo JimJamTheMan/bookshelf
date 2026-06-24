@@ -99,6 +99,33 @@ export async function getBookDetails(
   };
 }
 
+// Find an Open Library author id by exact name (fallback when Wikidata has no
+// link). Exact-match only, to avoid grabbing a different person's record.
+export async function findOpenLibraryAuthorId(
+  name: string,
+): Promise<string | null> {
+  try {
+    const res = await fetch(
+      `https://openlibrary.org/search/authors.json?q=${encodeURIComponent(name)}`,
+      {
+        headers: { "User-Agent": "Bookshelf/0.1 (jamesflower1994@gmail.com)" },
+        next: { revalidate: 86400 },
+      },
+    );
+    if (!res.ok) return null;
+    const data = (await res.json()) as {
+      docs?: { key?: string; name?: string; work_count?: number }[];
+    };
+    const target = name.trim().toLowerCase();
+    const exact = (data.docs ?? [])
+      .filter((d) => d.key && d.name && d.name.toLowerCase() === target)
+      .sort((a, b) => (b.work_count ?? 0) - (a.work_count ?? 0));
+    return exact[0]?.key ?? null;
+  } catch {
+    return null;
+  }
+}
+
 // An author and the books they've written (Open Library author OLID, e.g. OL23919A).
 export async function getOpenLibraryAuthor(
   authorId: string,
