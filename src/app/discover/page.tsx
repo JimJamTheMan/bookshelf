@@ -2,6 +2,9 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Cover } from "../_components/Cover";
 import { displayTitle } from "@/lib/format";
+import { openMedia } from "@/app/media-actions";
+import { getTrending, type TrendingItem } from "@/lib/tmdb";
+import { getRecommendations } from "@/lib/recommendations";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A", film: "#D94F4F", tv: "#4F7ED9",
@@ -24,6 +27,7 @@ type Person = {
   avatar_url: string | null;
 };
 
+// Grid of already-catalogued items (link straight to their detail page).
 function MediaGrid({ items }: { items: Media[] }) {
   return (
     <ul className="mt-4 grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
@@ -31,16 +35,9 @@ function MediaGrid({ items }: { items: Media[] }) {
         <li key={m.id}>
           <Link href={`/media/${m.id}`}>
             <div className="flex overflow-hidden rounded border border-white/10">
-              <div
-                className="w-1 shrink-0"
-                style={{ background: MEDIA_COLOR[m.media_type] ?? "#888" }}
-              />
+              <div className="w-1 shrink-0" style={{ background: MEDIA_COLOR[m.media_type] ?? "#888" }} />
               <div className="aspect-[2/3] flex-1 bg-black/30">
-                <Cover
-                  src={m.cover_url}
-                  title={m.title}
-                  color={MEDIA_COLOR[m.media_type] ?? "#888"}
-                />
+                <Cover src={m.cover_url} title={m.title} color={MEDIA_COLOR[m.media_type] ?? "#888"} />
               </div>
             </div>
           </Link>
@@ -48,6 +45,38 @@ function MediaGrid({ items }: { items: Media[] }) {
             {displayTitle(m.title, m.release_year, m.media_type)}
           </p>
           <p className="text-xs text-white/50">{m.creator ?? ""}</p>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// Grid of items not yet in our catalogue (cache on click, then open detail).
+function TrendingGrid({ items }: { items: TrendingItem[] }) {
+  return (
+    <ul className="mt-4 grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+      {items.map((m) => (
+        <li key={`${m.mediaType}-${m.sourceId}`}>
+          <form action={openMedia}>
+            <input type="hidden" name="media_type" value={m.mediaType} />
+            <input type="hidden" name="source" value={m.source} />
+            <input type="hidden" name="source_id" value={m.sourceId} />
+            <input type="hidden" name="title" value={m.title} />
+            <input type="hidden" name="release_year" value={m.year ?? ""} />
+            <input type="hidden" name="cover_url" value={m.coverUrl ?? ""} />
+            <input type="hidden" name="description" value={m.description ?? ""} />
+            <button type="submit" className="block w-full text-left">
+              <div className="flex overflow-hidden rounded border border-white/10">
+                <div className="w-1 shrink-0" style={{ background: MEDIA_COLOR[m.mediaType] ?? "#888" }} />
+                <div className="aspect-[2/3] flex-1 bg-black/30">
+                  <Cover src={m.coverUrl} title={m.title} color={MEDIA_COLOR[m.mediaType] ?? "#888"} />
+                </div>
+              </div>
+              <p className="mt-2 line-clamp-2 text-sm font-medium leading-tight">
+                {displayTitle(m.title, m.year, m.mediaType)}
+              </p>
+            </button>
+          </form>
         </li>
       ))}
     </ul>
@@ -66,17 +95,11 @@ function PeopleList({ people }: { people: Person[] }) {
             <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full border border-white/10 bg-white/10">
               {p.avatar_url && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={p.avatar_url}
-                  alt=""
-                  className="h-full w-full object-cover"
-                />
+                <img src={p.avatar_url} alt="" className="h-full w-full object-cover" />
               )}
             </div>
             <div>
-              <p className="text-sm font-medium">
-                {p.display_name || p.handle}
-              </p>
+              <p className="text-sm font-medium">{p.display_name || p.handle}</p>
               <p className="text-xs text-white/40">@{p.handle}</p>
             </div>
           </Link>
@@ -94,39 +117,109 @@ export default async function DiscoverPage({
   const { q } = await searchParams;
   const query = (q ?? "").trim();
   const supabase = await createClient();
-
-  let media: Media[] = [];
-  let people: Person[] = [];
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (query) {
     const { data: mediaData } = await supabase.rpc("search_media", {
       p_query: query,
     });
-    media = (mediaData ?? []) as Media[];
-
+    const media = (mediaData ?? []) as Media[];
     const { data: peopleData } = await supabase
       .from("profiles")
       .select("id, handle, display_name, avatar_url")
       .or(`handle.ilike.%${query}%,display_name.ilike.%${query}%`)
       .limit(20);
-    people = (peopleData ?? []) as Person[];
-  } else {
-    // Browse: most recently catalogued media + some people.
-    const { data: mediaData } = await supabase
-      .from("media_items")
-      .select("id, title, creator, release_year, cover_url, media_type")
-      .order("created_at", { ascending: false })
-      .limit(18);
-    media = (mediaData ?? []) as Media[];
+    const people = (peopleData ?? []) as Person[];
 
-    const { data: peopleData } = await supabase
-      .from("profiles")
-      .select("id, handle, display_name, avatar_url")
-      .order("created_at", { ascending: false })
-      .limit(12);
-    people = (peopleData ?? []) as Person[];
+    return (
+      <DiscoverShell query={query}>
+        <section className="mt-8">
+          <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
+            People
+          </h2>
+          {people.length > 0 ? (
+            <PeopleList people={people} />
+          ) : (
+            <p className="mt-3 text-sm text-white/50">No people found.</p>
+          )}
+        </section>
+        <section className="mt-10">
+          <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
+            Media
+          </h2>
+          {media.length > 0 ? (
+            <MediaGrid items={media} />
+          ) : (
+            <p className="mt-3 text-sm text-white/50">
+              No catalogued media matches — try a Search page to find new things.
+            </p>
+          )}
+        </section>
+      </DiscoverShell>
+    );
   }
 
+  // Browse: trending + personalised + people to follow.
+  const trending = await getTrending();
+  const recs = user
+    ? await getRecommendations(supabase, user.id)
+    : { byCreators: [], tasteMatches: [] };
+  const forYou = [...recs.byCreators, ...recs.tasteMatches].slice(0, 12);
+
+  const { data: peopleData } = await supabase
+    .from("profiles")
+    .select("id, handle, display_name, avatar_url")
+    .order("created_at", { ascending: false })
+    .limit(12);
+  const people = (peopleData ?? []) as Person[];
+
+  return (
+    <DiscoverShell query="">
+      {forYou.length > 0 && (
+        <section className="mt-8">
+          <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
+            For you
+          </h2>
+          <MediaGrid items={forYou} />
+        </section>
+      )}
+
+      <section className="mt-10">
+        <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
+          Popular this week
+        </h2>
+        {trending.length > 0 ? (
+          <TrendingGrid items={trending} />
+        ) : (
+          <p className="mt-3 text-sm text-white/50">
+            Couldn&apos;t load trending right now.
+          </p>
+        )}
+      </section>
+
+      <section className="mt-10">
+        <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
+          People to follow
+        </h2>
+        {people.length > 0 ? (
+          <PeopleList people={people} />
+        ) : (
+          <p className="mt-3 text-sm text-white/50">No people yet.</p>
+        )}
+      </section>
+    </DiscoverShell>
+  );
+}
+
+function DiscoverShell({
+  query,
+  children,
+}: {
+  query: string;
+  children: React.ReactNode;
+}) {
   return (
     <main className="min-h-screen bg-[#15130f] text-[#f5f3ee] p-8">
       <div className="mx-auto max-w-5xl">
@@ -150,31 +243,7 @@ export default async function DiscoverPage({
           </button>
         </form>
 
-        <section className="mt-8">
-          <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
-            {query ? "People" : "People to follow"}
-          </h2>
-          {people.length > 0 ? (
-            <PeopleList people={people} />
-          ) : (
-            <p className="mt-3 text-sm text-white/50">No people found.</p>
-          )}
-        </section>
-
-        <section className="mt-10">
-          <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
-            {query ? "Media" : "Recently added to the catalogue"}
-          </h2>
-          {media.length > 0 ? (
-            <MediaGrid items={media} />
-          ) : (
-            <p className="mt-3 text-sm text-white/50">
-              {query
-                ? "No catalogued media matches — try logging it from a Search page first."
-                : "Nothing in the catalogue yet."}
-            </p>
-          )}
-        </section>
+        {children}
       </div>
     </main>
   );

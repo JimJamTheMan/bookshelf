@@ -129,6 +129,43 @@ export async function searchTv(query: string): Promise<ScreenResult[]> {
   return searchScreen(query, "tv");
 }
 
+export type TrendingItem = {
+  mediaType: string;
+  source: string;
+  sourceId: string;
+  title: string;
+  year: number | null;
+  coverUrl: string | null;
+  description: string | null;
+};
+
+// What's popular this week (films + TV), live from TMDb.
+export async function getTrending(): Promise<TrendingItem[]> {
+  try {
+    const data = (await tmdbGet("/trending/all/week", {})) as {
+      results?: (RawWork & { media_type?: string })[];
+    };
+    return (data.results ?? [])
+      .filter((r) => r.media_type === "movie" || r.media_type === "tv")
+      .map((r) => {
+        const isTv = r.media_type === "tv";
+        return {
+          mediaType: isTv ? "tv" : "film",
+          source: "tmdb",
+          sourceId: String(r.id),
+          title: (isTv ? r.name : r.title) ?? "Untitled",
+          year: yearFrom(isTv ? r.first_air_date : r.release_date),
+          coverUrl: r.poster_path ? `${IMG_BASE}${r.poster_path}` : null,
+          description: r.overview || null,
+        };
+      })
+      .filter((x) => x.coverUrl)
+      .slice(0, 18);
+  } catch {
+    return [];
+  }
+}
+
 const BACKDROP_BASE = "https://image.tmdb.org/t/p/w1280";
 
 // Full details for one film or TV show (with credits + release dates for films).
