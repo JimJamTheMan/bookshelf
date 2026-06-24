@@ -20,6 +20,8 @@ export type MediaDetails = {
   releases?: { region: string; date: string; cert: string | null }[];
   // For music: link the album's artist to their person page.
   creatorLink?: { source: string; id: string } | null;
+  // Credited people to show as links (e.g. all artists on a release).
+  contributors?: { id: string | null; name: string; source: string }[];
 };
 
 export async function fetchMediaDetails(

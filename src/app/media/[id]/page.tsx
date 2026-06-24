@@ -68,6 +68,7 @@ export default async function MediaPage({
   const backdropUrl = details?.backdropUrl ?? null;
   const tagline = details?.tagline ?? null;
   const creatorLink = details?.creatorLink ?? null;
+  const contributors = details?.contributors ?? [];
 
   const {
     data: { user },
@@ -134,19 +135,39 @@ export default async function MediaPage({
           <span className="font-normal text-white/40"> ({media.release_year})</span>
         )}
       </h1>
-      {media.creator && (
+      {contributors.length > 0 ? (
         <p className="mt-1 text-sm text-white/50">
-          {creatorLink ? (
-            <Link
-              href={`/person/${creatorLink.source}/${encodeURIComponent(creatorLink.id)}`}
-              className="font-medium text-white/80 underline underline-offset-2 decoration-white/30 hover:decoration-white"
-            >
-              {media.creator}
-            </Link>
-          ) : (
-            media.creator
-          )}
+          {contributors.map((c, i) => (
+            <span key={`${c.name}-${i}`}>
+              {i > 0 && ", "}
+              {c.id ? (
+                <Link
+                  href={`/person/${c.source}/${encodeURIComponent(c.id)}`}
+                  className="font-medium text-white/80 underline underline-offset-2 decoration-white/30 hover:decoration-white"
+                >
+                  {c.name}
+                </Link>
+              ) : (
+                c.name
+              )}
+            </span>
+          ))}
         </p>
+      ) : (
+        media.creator && (
+          <p className="mt-1 text-sm text-white/50">
+            {creatorLink ? (
+              <Link
+                href={`/person/${creatorLink.source}/${encodeURIComponent(creatorLink.id)}`}
+                className="font-medium text-white/80 underline underline-offset-2 decoration-white/30 hover:decoration-white"
+              >
+                {media.creator}
+              </Link>
+            ) : (
+              media.creator
+            )}
+          </p>
+        )
       )}
       {crew.length > 0 && (
         <p className="mt-1 text-sm text-white/50">

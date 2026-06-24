@@ -117,11 +117,17 @@ export async function getMusicDetails(
   };
 
   const facts: { label: string; value: string }[] = [];
-  const artist = (d["artist-credit"] ?? [])
-    .map((a) => a.name)
-    .filter(Boolean)
-    .join(", ");
-  if (artist) facts.push({ label: "Artist", value: artist });
+  // Each credited artist, linkable to their page (skip the Various Artists placeholder).
+  const contributors = (d["artist-credit"] ?? [])
+    .filter((a) => a.name)
+    .map((a) => ({
+      id:
+        a.artist?.id && !isVariousArtists(a.artist.id, a.name)
+          ? a.artist.id
+          : null,
+      name: a.name as string,
+      source: "musicbrainz",
+    }));
   if (d["primary-type"]) facts.push({ label: "Type", value: d["primary-type"] });
   if (d["first-release-date"])
     facts.push({ label: "Released", value: d["first-release-date"] });
@@ -140,6 +146,7 @@ export async function getMusicDetails(
     description: null,
     facts,
     creatorLink: linkable ? { source: "musicbrainz", id: artistId } : null,
+    contributors,
   };
 }
 
