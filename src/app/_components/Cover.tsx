@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { hiResCover } from "@/lib/format";
 
 // Shows a cover image, falling back to a tasteful colour-tinted tile with the
 // title if the image is missing or fails to load (e.g. albums with no cover art).
@@ -29,7 +30,7 @@ export function Cover({
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={src}
+      src={hiResCover(src) ?? src}
       alt={`Cover of ${title}`}
       className="h-full w-full object-cover"
       loading="lazy"

@@ -14,7 +14,7 @@ export type ScreenResult = {
   description: string | null;
 };
 
-const IMG_BASE = "https://image.tmdb.org/t/p/w342";
+const IMG_BASE = "https://image.tmdb.org/t/p/w500";
 
 function yearFrom(date: string | undefined): number | null {
   if (!date) return null;

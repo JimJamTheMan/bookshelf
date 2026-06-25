@@ -70,7 +70,7 @@ export async function searchMusic(query: string): Promise<MusicResult[]> {
         title: rg.title ?? "Untitled",
         artist: rg["artist-credit"]?.[0]?.name ?? null,
         year: Number.isFinite(year) ? year : null,
-        coverUrl: `https://coverartarchive.org/release-group/${rg.id}/front-250`,
+        coverUrl: `https://coverartarchive.org/release-group/${rg.id}/front-500`,
       };
     });
 
@@ -234,7 +234,7 @@ export async function getMusicArtist(mbid: string): Promise<Person | null> {
         sourceId: rg.id,
         title: rg.title ?? "Untitled",
         year: Number.isFinite(year) ? year : null,
-        coverUrl: `https://coverartarchive.org/release-group/${rg.id}/front-250`,
+        coverUrl: `https://coverartarchive.org/release-group/${rg.id}/front-500`,
         role: rg["primary-type"] ?? null,
         creator: d.name ?? null,
       };

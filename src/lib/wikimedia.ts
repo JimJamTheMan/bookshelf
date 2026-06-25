@@ -33,7 +33,7 @@ export async function searchArt(query: string): Promise<ArtResult[]> {
   url.searchParams.set("gsrlimit", "24");
   url.searchParams.set("prop", "imageinfo");
   url.searchParams.set("iiprop", "url|extmetadata");
-  url.searchParams.set("iiurlwidth", "400");
+  url.searchParams.set("iiurlwidth", "600");
 
   const res = await fetch(url, {
     headers: {

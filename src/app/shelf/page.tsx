@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { starsFromRating } from "@/lib/stars";
 import { statusLabel } from "@/lib/status";
-import { displayTitle } from "@/lib/format";
+import { displayTitle, hiResCover } from "@/lib/format";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A",
@@ -136,7 +136,7 @@ export default async function ShelfPage({
                         {row.media.cover_url ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
-                            src={row.media.cover_url}
+                            src={hiResCover(row.media.cover_url) ?? undefined}
                             alt={`Cover of ${row.media.title}`}
                             className="h-full w-full object-cover"
                             loading="lazy"

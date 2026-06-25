@@ -48,7 +48,7 @@ export async function searchBooks(query: string): Promise<BookResult[]> {
     author: d.author_name?.[0] ?? null,
     year: d.first_publish_year ?? null,
     coverUrl: d.cover_i
-      ? `https://covers.openlibrary.org/b/id/${d.cover_i}-M.jpg`
+      ? `https://covers.openlibrary.org/b/id/${d.cover_i}-L.jpg`
       : null,
   }));
 
@@ -228,7 +228,7 @@ export async function getOpenLibraryAuthor(
       sourceId: String(d.key).replace("/works/", ""),
       title: d.title ?? "Untitled",
       year: d.first_publish_year ?? null,
-      coverUrl: `https://covers.openlibrary.org/b/id/${d.cover_i}-M.jpg`,
+      coverUrl: `https://covers.openlibrary.org/b/id/${d.cover_i}-L.jpg`,
       role: null,
       creator: name,
     });

@@ -5,6 +5,7 @@ import { Cover } from "../../_components/Cover";
 import { starsFromRating } from "@/lib/stars";
 import { fetchMediaDetails } from "@/lib/media-details";
 import { openMedia } from "@/app/media-actions";
+import { hiResCover } from "@/lib/format";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A", film: "#D94F4F", tv: "#4F7ED9",
@@ -224,7 +225,7 @@ export default async function MediaPage({
           <div className="absolute inset-0 overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={heroImg}
+              src={hiResCover(heroImg) ?? heroImg}
               alt=""
               className={`h-full w-full object-cover opacity-25 ${
                 backdropUrl ? "" : "scale-125 blur-2xl"
