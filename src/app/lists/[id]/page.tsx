@@ -94,7 +94,7 @@ export default async function ListDetailPage({
               it.media ? (
                 <li key={it.media_id}>
                   <Link href={`/media/${it.media.id}`}>
-                    <div className="flex overflow-hidden rounded border border-white/10">
+                    <div className="tile flex overflow-hidden rounded border border-white/10">
                       <div
                         className="w-1 shrink-0"
                         style={{

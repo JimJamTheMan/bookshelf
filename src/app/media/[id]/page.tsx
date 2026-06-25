@@ -466,7 +466,7 @@ export default async function MediaPage({
                       value={s.coverUrl ?? ""}
                     />
                     <button type="submit" className="block w-full text-left">
-                      <div className="flex overflow-hidden rounded border border-white/10">
+                      <div className="tile flex overflow-hidden rounded border border-white/10">
                         <div
                           className="w-1 shrink-0"
                           style={{ background: color }}

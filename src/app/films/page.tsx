@@ -68,7 +68,7 @@ export default async function FilmsPage({
           <ul className="mt-8 grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
             {results.map((film) => (
               <li key={film.sourceId}>
-                <div className="flex overflow-hidden rounded border border-white/10">
+                <div className="tile flex overflow-hidden rounded border border-white/10">
                   <div
                     className="w-1 shrink-0"
                     style={{ background: FILM_COLOR }}

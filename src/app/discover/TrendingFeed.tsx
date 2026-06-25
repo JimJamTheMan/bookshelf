@@ -74,7 +74,7 @@ export function TrendingFeed({ initial }: { initial: TrendingItem[] }) {
                   value={m.description ?? ""}
                 />
                 <button type="submit" className="block w-full text-left">
-                  <div className="flex overflow-hidden rounded border border-white/10">
+                  <div className="tile flex overflow-hidden rounded border border-white/10">
                     <div className="w-1 shrink-0" style={{ background: color }} />
                     <div className={`${coverAspect(m.mediaType)} flex-1 bg-black/30`}>
                       <Cover src={m.coverUrl} title={m.title} color={color} />

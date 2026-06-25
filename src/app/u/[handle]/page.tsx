@@ -232,7 +232,7 @@ export default async function PublicProfilePage({
                 row.media ? (
                   <li key={`${row.media.id}-${i}`}>
                     <Link href={`/media/${row.media.id}`}>
-                      <div className="flex overflow-hidden rounded border border-white/10">
+                      <div className="tile flex overflow-hidden rounded border border-white/10">
                         <div
                           className="w-1 shrink-0"
                           style={{
@@ -276,7 +276,7 @@ export default async function PublicProfilePage({
               {featured.map((m) => (
                 <li key={m.id}>
                   <Link href={`/media/${m.id}`}>
-                    <div className="flex overflow-hidden rounded border border-white/10">
+                    <div className="tile flex overflow-hidden rounded border border-white/10">
                       <div
                         className="w-1 shrink-0"
                         style={{ background: MEDIA_COLOR[m.media_type] ?? "#888" }}

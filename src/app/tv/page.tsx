@@ -70,7 +70,7 @@ export default async function TvPage({
           <ul className="mt-8 grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
             {results.map((show) => (
               <li key={show.sourceId}>
-                <div className="flex overflow-hidden rounded border border-white/10">
+                <div className="tile flex overflow-hidden rounded border border-white/10">
                   <div
                     className="w-1 shrink-0"
                     style={{ background: TV_COLOR }}

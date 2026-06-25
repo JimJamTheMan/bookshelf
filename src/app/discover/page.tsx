@@ -36,7 +36,7 @@ function MediaGrid({ items }: { items: Media[] }) {
       {items.map((m) => (
         <li key={m.id}>
           <Link href={`/media/${m.id}`}>
-            <div className="flex overflow-hidden rounded border border-white/10">
+            <div className="tile flex overflow-hidden rounded border border-white/10">
               <div className="w-1 shrink-0" style={{ background: MEDIA_COLOR[m.media_type] ?? "#888" }} />
               <div className={`${coverAspect(m.media_type)} flex-1 bg-black/30`}>
                 <Cover src={m.cover_url} title={m.title} color={MEDIA_COLOR[m.media_type] ?? "#888"} />

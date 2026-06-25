@@ -29,7 +29,7 @@ function Tile({ h }: { h: SearchHit }) {
   const color = MEDIA_COLOR[h.mediaType] ?? "#888";
   return (
     <li>
-      <div className="flex overflow-hidden rounded border border-white/10">
+      <div className="tile flex overflow-hidden rounded border border-white/10">
         <div className="w-1 shrink-0" style={{ background: color }} />
         <div className={`${coverAspect(h.mediaType)} flex-1 bg-black/30`}>
           <Cover src={h.coverUrl} title={h.title} color={color} />

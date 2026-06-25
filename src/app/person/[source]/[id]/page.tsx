@@ -28,7 +28,7 @@ function WorkTile({ w }: { w: PersonWork }) {
         <input type="hidden" name="release_year" value={w.year ?? ""} />
         <input type="hidden" name="cover_url" value={w.coverUrl ?? ""} />
         <button type="submit" className="block w-full text-left">
-          <div className="flex overflow-hidden rounded border border-white/10">
+          <div className="tile flex overflow-hidden rounded border border-white/10">
             <div className="w-1 shrink-0" style={{ background: color }} />
             <div className={`${coverAspect(w.mediaType)} flex-1 bg-black/30`}>
               <Cover src={w.coverUrl} title={w.title} color={color} />
