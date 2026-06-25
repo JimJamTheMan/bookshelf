@@ -9,8 +9,8 @@ import { NavSearch } from "./NavSearch";
 const PRIMARY = [
   { href: "/feed", label: "Activity" },
   { href: "/discover", label: "Discover" },
-  { href: "/members", label: "Members" },
   { href: "/lists", label: "Lists" },
+  { href: "/members", label: "Members" },
 ];
 
 // What signed-out visitors can browse.
