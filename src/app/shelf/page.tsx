@@ -124,7 +124,7 @@ export default async function ShelfPage({
               row.media ? (
                 <li key={row.media.id}>
                   <Link href={`/media/${row.media.id}`}>
-                    <div className="flex overflow-hidden rounded border border-white/10">
+                    <div className="tile flex overflow-hidden rounded border border-white/10">
                       <div
                         className="w-1 shrink-0"
                         style={{

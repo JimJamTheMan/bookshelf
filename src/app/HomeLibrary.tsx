@@ -120,7 +120,7 @@ export function HomeLibrary({ items }: { items: LibItem[] }) {
               return (
                 <li key={it.id}>
                   <Link href={`/media/${it.id}`}>
-                    <div className="flex overflow-hidden rounded border border-white/10">
+                    <div className="tile flex overflow-hidden rounded border border-white/10">
                       <div className="w-1 shrink-0" style={{ background: color }} />
                       <div className="aspect-square flex-1 bg-black/30">
                         <Cover src={it.cover_url} title={it.title} color={color} />
