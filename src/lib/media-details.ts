@@ -22,6 +22,15 @@ export type MediaDetails = {
   creatorLink?: { source: string; id: string } | null;
   // Credited people to show as links (e.g. all artists on a release).
   contributors?: { id: string | null; name: string; source: string }[];
+  // "Similar" items (cache-on-click tiles, like search results).
+  similar?: {
+    mediaType: string;
+    source: string;
+    sourceId: string;
+    title: string;
+    year: number | null;
+    coverUrl: string | null;
+  }[];
 };
 
 export async function fetchMediaDetails(

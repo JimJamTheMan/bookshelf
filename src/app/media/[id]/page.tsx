@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Cover } from "../../_components/Cover";
 import { starsFromRating } from "@/lib/stars";
 import { fetchMediaDetails } from "@/lib/media-details";
+import { openMedia } from "@/app/media-actions";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A", film: "#D94F4F", tv: "#4F7ED9",
@@ -70,6 +71,7 @@ export default async function MediaPage({
   const tagline = details?.tagline ?? null;
   const creatorLink = details?.creatorLink ?? null;
   const contributors = details?.contributors ?? [];
+  const similar = details?.similar ?? [];
 
   const {
     data: { user },
@@ -212,17 +214,21 @@ export default async function MediaPage({
     </div>
   );
 
+  const heroImg = backdropUrl ?? media.cover_url;
+
   return (
     <main className="min-h-screen bg-[#15130f] text-[#f5f3ee]">
-      {/* Hero */}
-      {backdropUrl ? (
+      {/* Hero — real backdrop for films/TV, blurred cover for everything else */}
+      {heroImg ? (
         <div className="relative">
           <div className="absolute inset-0 overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={backdropUrl}
+              src={heroImg}
               alt=""
-              className="h-full w-full object-cover opacity-25"
+              className={`h-full w-full object-cover opacity-25 ${
+                backdropUrl ? "" : "scale-125 blur-2xl"
+              }`}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#15130f] via-[#15130f]/80 to-[#15130f]/40" />
           </div>
@@ -337,6 +343,54 @@ export default async function MediaPage({
                     ) : null}
                   </span>
                   <span className="text-white/50">{formatDate(r.date)}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {similar.length > 0 && (
+          <section className="mt-8">
+            <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
+              {media.media_type === "tv" ? "Similar shows" : "Similar films"}
+            </h2>
+            <ul className="mt-3 grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-6">
+              {similar.map((s) => (
+                <li key={`${s.source}-${s.sourceId}`}>
+                  <form action={openMedia}>
+                    <input type="hidden" name="media_type" value={s.mediaType} />
+                    <input type="hidden" name="source" value={s.source} />
+                    <input type="hidden" name="source_id" value={s.sourceId} />
+                    <input type="hidden" name="title" value={s.title} />
+                    <input
+                      type="hidden"
+                      name="release_year"
+                      value={s.year ?? ""}
+                    />
+                    <input
+                      type="hidden"
+                      name="cover_url"
+                      value={s.coverUrl ?? ""}
+                    />
+                    <button type="submit" className="block w-full text-left">
+                      <div className="flex overflow-hidden rounded border border-white/10">
+                        <div
+                          className="w-1 shrink-0"
+                          style={{ background: color }}
+                        />
+                        <div className="aspect-[2/3] flex-1 bg-black/30">
+                          <Cover
+                            src={s.coverUrl}
+                            title={s.title}
+                            color={color}
+                          />
+                        </div>
+                      </div>
+                      <p className="mt-1 line-clamp-2 text-xs font-medium leading-tight">
+                        {s.title}
+                      </p>
+                    </button>
+                  </form>
                 </li>
               ))}
             </ul>

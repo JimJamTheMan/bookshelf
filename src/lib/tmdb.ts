@@ -179,7 +179,7 @@ export async function getScreenDetails(
   if (!token || token.startsWith("PASTE_")) return null;
 
   const isTv = mediaType === "tv";
-  const append = isTv ? "credits" : "credits,release_dates";
+  const append = isTv ? "credits,similar" : "credits,release_dates,similar";
   const url = `https://api.themoviedb.org/3/${isTv ? "tv" : "movie"}/${id}?append_to_response=${append}`;
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
@@ -211,6 +211,7 @@ export async function getScreenDetails(
         }[];
       }[];
     };
+    similar?: { results?: RawWork[] };
   };
 
   const facts: { label: string; value: string }[] = [];
@@ -261,6 +262,18 @@ export async function getScreenDetails(
     .filter((x): x is { region: string; date: string; cert: string | null } => !!x)
     .sort((a, b) => a.date.localeCompare(b.date));
 
+  const similar = (d.similar?.results ?? [])
+    .map((w) => ({
+      mediaType: isTv ? "tv" : "film",
+      source: "tmdb",
+      sourceId: String(w.id),
+      title: (isTv ? w.name : w.title) ?? "Untitled",
+      year: yearFrom(isTv ? w.first_air_date : w.release_date),
+      coverUrl: w.poster_path ? `${IMG_BASE}${w.poster_path}` : null,
+    }))
+    .filter((x) => x.coverUrl)
+    .slice(0, 12);
+
   return {
     description: d.overview || null,
     facts,
@@ -270,6 +283,7 @@ export async function getScreenDetails(
     cast,
     crew,
     releases,
+    similar,
   };
 }
 
