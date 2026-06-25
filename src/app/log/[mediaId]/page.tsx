@@ -5,6 +5,7 @@ import { saveLog, deleteLog } from "./actions";
 import { addToList } from "@/app/lists/actions";
 import { toggleFeatured } from "@/app/profile/actions";
 import { RATING_OPTIONS } from "@/lib/stars";
+import { BackButton } from "@/app/_components/BackButton";
 
 // Status wording is phrased per medium (read / watch / listen / play / view).
 const VERBS: Record<
@@ -105,12 +106,7 @@ export default async function LogPage({
   return (
     <main className="min-h-screen text-[#e8c58f] px-4 py-8 sm:p-8">
       <div className="mx-auto max-w-lg">
-        <Link
-          href={SEARCH_PATH[media.media_type] ?? "/"}
-          className="text-sm text-white/50 hover:text-white/80"
-        >
-          ← Back to search
-        </Link>
+        <BackButton className="text-sm text-white/50 hover:text-white/80" />
 
         <div className="mt-4 flex gap-4">
           <div className="flex w-20 shrink-0 overflow-hidden rounded border border-white/10">

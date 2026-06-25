@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Cover } from "../_components/Cover";
 import { starsFromRating } from "@/lib/stars";
 import { coverAspect, displayTitle } from "@/lib/format";
+import { BackButton } from "@/app/_components/BackButton";
 
 const STATUS_VERB: Record<string, Record<string, string>> = {
   book: { planned: "wants to read", in_progress: "is reading", completed: "read", on_hold: "paused", dropped: "dropped" },
@@ -87,9 +88,7 @@ export default async function FeedPage() {
       <div className="mx-auto max-w-2xl">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">Feed</h1>
-          <Link href="/" className="text-sm text-white/50 hover:text-white/80">
-            ← Home
-          </Link>
+          <BackButton className="text-sm text-white/50 hover:text-white/80" />
         </div>
         <p className="mt-1 text-sm text-white/50">
           Activity from people you follow.

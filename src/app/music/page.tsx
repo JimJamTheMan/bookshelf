@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { searchMusic, type MusicResult } from "@/lib/musicbrainz";
 import { openMedia, startLog } from "../media-actions";
 import { SearchTabs } from "../_components/SearchTabs";
 import { Cover } from "../_components/Cover";
+import { BackButton } from "@/app/_components/BackButton";
 
 const MUSIC_COLOR = "#D94FB8"; // the fixed accent colour for music
 
@@ -32,9 +32,7 @@ export default async function MusicPage({
           <h1 className="text-2xl font-semibold tracking-tight">
             Search music
           </h1>
-          <Link href="/" className="text-sm text-white/50 hover:text-white/80">
-            ← Home
-          </Link>
+          <BackButton className="text-sm text-white/50 hover:text-white/80" />
         </div>
 
         <form method="get" className="mt-6 flex gap-3">

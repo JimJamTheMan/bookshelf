@@ -7,6 +7,7 @@ import { getRecommendations } from "@/lib/recommendations";
 import { searchAllMedia } from "@/lib/search-all";
 import { VendorResults } from "../_components/VendorResults";
 import { TrendingFeed } from "./TrendingFeed";
+import { BackButton } from "@/app/_components/BackButton";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A", film: "#D94F4F", tv: "#4F7ED9",
@@ -182,9 +183,7 @@ function DiscoverShell({
       <div className="mx-auto max-w-5xl">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">Discover</h1>
-          <Link href="/" className="text-sm text-white/50 hover:text-white/80">
-            ← Home
-          </Link>
+          <BackButton className="text-sm text-white/50 hover:text-white/80" />
         </div>
 
         <form method="get" className="mt-6 flex gap-3">

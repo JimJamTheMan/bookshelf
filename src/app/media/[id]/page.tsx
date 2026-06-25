@@ -10,6 +10,7 @@ import { ShareButton } from "../../_components/ShareButton";
 import { findSpotifyAlbum } from "@/lib/spotify";
 import { TrailerEmbed } from "../../_components/TrailerEmbed";
 import { pickEmbeddableYouTube } from "@/lib/youtube";
+import { BackButton } from "@/app/_components/BackButton";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A", film: "#D94F4F", tv: "#4F7ED9",
@@ -259,12 +260,7 @@ export default async function MediaPage({
             <div className="absolute inset-0 bg-gradient-to-t from-[#200f0a] via-[#200f0a]/80 to-[#200f0a]/40" />
           </div>
           <div className="relative mx-auto max-w-3xl px-4 sm:px-8 pb-6 pt-6">
-            <Link
-              href={SEARCH_PATH[media.media_type] ?? "/"}
-              className="text-sm text-white/60 hover:text-white"
-            >
-              ← Back to search
-            </Link>
+            <BackButton className="text-sm text-white/60 hover:text-white" />
             <div className="mt-16 flex items-end gap-6">
               {poster}
               {titleBlock}
@@ -273,12 +269,7 @@ export default async function MediaPage({
         </div>
       ) : (
         <div className="mx-auto max-w-3xl px-4 sm:px-8 pt-6">
-          <Link
-            href={SEARCH_PATH[media.media_type] ?? "/"}
-            className="text-sm text-white/50 hover:text-white/80"
-          >
-            ← Back to search
-          </Link>
+          <BackButton className="text-sm text-white/50 hover:text-white/80" />
           <div className="mt-4 flex gap-6">
             {poster}
             {titleBlock}

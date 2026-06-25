@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Cover } from "../_components/Cover";
 import { coverAspect, displayTitle } from "@/lib/format";
 import { getRecommendations } from "@/lib/recommendations";
+import { BackButton } from "@/app/_components/BackButton";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A", film: "#D94F4F", tv: "#4F7ED9",
@@ -61,9 +62,7 @@ export default async function RecommendationsPage() {
       <div className="mx-auto max-w-5xl">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">For you</h1>
-          <Link href="/" className="text-sm text-white/50 hover:text-white/80">
-            ← Home
-          </Link>
+          <BackButton className="text-sm text-white/50 hover:text-white/80" />
         </div>
         <p className="mt-1 text-sm text-white/50">
           Suggestions based only on your own ratings and activity.

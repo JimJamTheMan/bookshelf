@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { updateProfile } from "./actions";
+import { BackButton } from "@/app/_components/BackButton";
 
 // The logged-in user's own profile — editable.
 export default async function ProfilePage({
@@ -31,9 +32,7 @@ export default async function ProfilePage({
       <div className="w-full max-w-lg border border-white/10 rounded-lg p-8 bg-black/20">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">Your profile</h1>
-          <Link href="/" className="text-sm text-white/50 hover:text-white/80">
-            ← Home
-          </Link>
+          <BackButton className="text-sm text-white/50 hover:text-white/80" />
         </div>
 
         {profile?.handle && (

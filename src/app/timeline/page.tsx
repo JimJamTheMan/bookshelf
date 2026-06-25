@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Cover } from "../_components/Cover";
 import { starsFromRating } from "@/lib/stars";
 import { coverAspect } from "@/lib/format";
+import { BackButton } from "@/app/_components/BackButton";
 
 const STATUS_LABEL: Record<string, string> = {
   planned: "Wants to try",
@@ -81,9 +82,7 @@ export default async function TimelinePage() {
       <div className="mx-auto max-w-2xl">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">Timeline</h1>
-          <Link href="/" className="text-sm text-white/50 hover:text-white/80">
-            ← Home
-          </Link>
+          <BackButton className="text-sm text-white/50 hover:text-white/80" />
         </div>
         <p className="mt-1 text-sm text-white/50">
           Everything you&apos;ve logged, newest first.

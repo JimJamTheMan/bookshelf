@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { requestPasswordReset } from "./actions";
+import { BackButton } from "@/app/_components/BackButton";
 
 export default async function ForgotPasswordPage({
   searchParams,
@@ -44,12 +44,7 @@ export default async function ForgotPasswordPage({
           </button>
         </form>
 
-        <Link
-          href="/login"
-          className="mt-4 inline-block text-sm text-white/50 hover:text-white/80"
-        >
-          ← Back to log in
-        </Link>
+        <BackButton className="mt-4 inline-block text-sm text-white/50 hover:text-white/80" />
       </div>
     </main>
   );

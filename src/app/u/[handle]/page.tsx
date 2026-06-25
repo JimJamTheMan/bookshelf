@@ -7,6 +7,7 @@ import { statusLabel } from "@/lib/status";
 import { coverAspect, displayTitle } from "@/lib/format";
 import { follow, unfollow } from "./actions";
 import { ShareButton } from "../../_components/ShareButton";
+import { BackButton } from "@/app/_components/BackButton";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A", film: "#D94F4F", tv: "#4F7ED9",
@@ -135,12 +136,7 @@ export default async function PublicProfilePage({
               className="h-full w-full object-cover"
             />
           )}
-          <Link
-            href="/"
-            className="absolute left-3 top-3 rounded bg-black/40 px-2 py-1 text-xs text-white/80 hover:bg-black/60"
-          >
-            ← Home
-          </Link>
+          <BackButton className="absolute left-3 top-3 rounded bg-black/40 px-2 py-1 text-xs text-white/80 hover:bg-black/60" />
         </div>
 
         <div className="relative z-10 px-6 pb-6">

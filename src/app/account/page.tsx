@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { deleteAccount } from "./actions";
+import { BackButton } from "@/app/_components/BackButton";
 
 export default async function AccountPage({
   searchParams,
@@ -22,9 +23,7 @@ export default async function AccountPage({
           <h1 className="text-2xl font-semibold tracking-tight">
             Account settings
           </h1>
-          <Link href="/" className="text-sm text-white/50 hover:text-white/80">
-            ← Home
-          </Link>
+          <BackButton className="text-sm text-white/50 hover:text-white/80" />
         </div>
 
         <p className="mt-2 text-sm text-white/50">

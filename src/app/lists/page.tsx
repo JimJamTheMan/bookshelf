@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createList } from "./actions";
+import { BackButton } from "@/app/_components/BackButton";
 
 type ListRow = {
   id: string;
@@ -35,9 +36,7 @@ export default async function ListsPage({
       <div className="mx-auto max-w-2xl">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">My lists</h1>
-          <Link href="/" className="text-sm text-white/50 hover:text-white/80">
-            ← Home
-          </Link>
+          <BackButton className="text-sm text-white/50 hover:text-white/80" />
         </div>
 
         {error && (

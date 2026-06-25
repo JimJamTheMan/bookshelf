@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { searchGames, type GameResult } from "@/lib/igdb";
 import { openMedia, startLog } from "../media-actions";
 import { SearchTabs } from "../_components/SearchTabs";
+import { BackButton } from "@/app/_components/BackButton";
 
 const GAME_COLOR = "#7A4FD9"; // the fixed accent colour for games
 
@@ -34,9 +34,7 @@ export default async function GamesPage({
           <h1 className="text-2xl font-semibold tracking-tight">
             Search games
           </h1>
-          <Link href="/" className="text-sm text-white/50 hover:text-white/80">
-            ← Home
-          </Link>
+          <BackButton className="text-sm text-white/50 hover:text-white/80" />
         </div>
 
         <form method="get" className="mt-6 flex gap-3">

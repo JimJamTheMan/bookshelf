@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { markAllRead } from "./actions";
+import { BackButton } from "@/app/_components/BackButton";
 
 const TYPE_TEXT: Record<string, string> = {
   follow: "started following you",
@@ -72,9 +73,7 @@ export default async function NotificationsPage() {
           <h1 className="text-2xl font-semibold tracking-tight">
             Notifications
           </h1>
-          <Link href="/" className="text-sm text-white/50 hover:text-white/80">
-            ← Home
-          </Link>
+          <BackButton className="text-sm text-white/50 hover:text-white/80" />
         </div>
 
         {hasUnread && (

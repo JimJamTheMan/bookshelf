@@ -4,6 +4,7 @@ import { Cover } from "../../../_components/Cover";
 import { fetchPerson, type PersonWork } from "@/lib/people";
 import { openMedia } from "@/app/media-actions";
 import { coverAspect, displayTitle } from "@/lib/format";
+import { BackButton } from "@/app/_components/BackButton";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A", film: "#D94F4F", tv: "#4F7ED9",
@@ -58,9 +59,7 @@ export default async function PersonPage({
   return (
     <main className="min-h-screen text-[#e8c58f] px-4 py-8 sm:p-8">
       <div className="mx-auto max-w-5xl">
-        <Link href="/" className="text-sm text-white/50 hover:text-white/80">
-          ← Home
-        </Link>
+        <BackButton className="text-sm text-white/50 hover:text-white/80" />
 
         <div className="mt-4 flex items-start gap-5">
           {person.photoUrl ? (

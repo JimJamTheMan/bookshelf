@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { searchArt, type ArtResult } from "@/lib/wikimedia";
 import { openMedia, startLog } from "../media-actions";
 import { SearchTabs } from "../_components/SearchTabs";
 import { Cover } from "../_components/Cover";
+import { BackButton } from "@/app/_components/BackButton";
 
 const ART_COLOR = "#BFA34F"; // accent colour for art
 
@@ -30,9 +30,7 @@ export default async function ArtPage({
       <div className="mx-auto max-w-5xl">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">Search art</h1>
-          <Link href="/" className="text-sm text-white/50 hover:text-white/80">
-            ← Home
-          </Link>
+          <BackButton className="text-sm text-white/50 hover:text-white/80" />
         </div>
 
         <form method="get" className="mt-6 flex gap-3">

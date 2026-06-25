@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { starsFromRating } from "@/lib/stars";
 import { statusLabel } from "@/lib/status";
 import { coverAspect, displayTitle, hiResCover } from "@/lib/format";
+import { BackButton } from "@/app/_components/BackButton";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A",
@@ -70,9 +71,7 @@ export default async function ShelfPage({
       <div className="mx-auto max-w-5xl">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">My shelf</h1>
-          <Link href="/" className="text-sm text-white/50 hover:text-white/80">
-            ← Home
-          </Link>
+          <BackButton className="text-sm text-white/50 hover:text-white/80" />
         </div>
 
         <form method="get" className="mt-6 flex gap-3">

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { follow, unfollow } from "../u/[handle]/actions";
+import { BackButton } from "@/app/_components/BackButton";
 
 type Member = {
   id: string;
@@ -55,9 +56,7 @@ export default async function MembersPage({
       <div className="mx-auto max-w-3xl">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">Members</h1>
-          <Link href="/" className="text-sm text-white/50 hover:text-white/80">
-            ← Home
-          </Link>
+          <BackButton className="text-sm text-white/50 hover:text-white/80" />
         </div>
         <p className="mt-1 text-sm text-white/50">
           Find and follow other people to fill your feed.
