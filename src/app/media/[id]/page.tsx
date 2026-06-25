@@ -309,16 +309,26 @@ export default async function MediaPage({
               <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
                 Trailer
               </h2>
-              <div className="mt-3 aspect-video w-full max-w-2xl overflow-hidden rounded-xl">
-                <iframe
-                  src={`https://www.youtube.com/embed/${trailerKey}`}
-                  title="Trailer"
-                  className="h-full w-full"
-                  style={{ border: 0 }}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
+              {/* A thumbnail that opens YouTube — reliable even when a video
+                  blocks embedding (which shows an in-player error otherwise). */}
+              <a
+                href={`https://www.youtube.com/watch?v=${trailerKey}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative mt-3 block aspect-video w-full max-w-2xl overflow-hidden rounded-xl border border-white/10"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`https://i.ytimg.com/vi/${trailerKey}/hqdefault.jpg`}
+                  alt="Trailer thumbnail"
+                  className="h-full w-full object-cover transition group-hover:scale-105"
                 />
-              </div>
+                <span className="absolute inset-0 flex items-center justify-center bg-black/30 transition group-hover:bg-black/20">
+                  <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#FF0000] text-xl text-white shadow-lg">
+                    ▶
+                  </span>
+                </span>
+              </a>
             </section>
           )}
 
