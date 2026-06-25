@@ -4,6 +4,8 @@ import { Cover } from "../_components/Cover";
 import { coverAspect, displayTitle } from "@/lib/format";
 import { getTrending } from "@/lib/tmdb";
 import { getRecommendations } from "@/lib/recommendations";
+import { searchAllMedia } from "@/lib/search-all";
+import { VendorResults } from "../_components/VendorResults";
 import { TrendingFeed } from "./TrendingFeed";
 
 const MEDIA_COLOR: Record<string, string> = {
@@ -90,41 +92,28 @@ export default async function DiscoverPage({
   } = await supabase.auth.getUser();
 
   if (query) {
-    const { data: mediaData } = await supabase.rpc("search_media", {
-      p_query: query,
-    });
-    const media = (mediaData ?? []) as Media[];
-    const { data: peopleData } = await supabase
-      .from("profiles")
-      .select("id, handle, display_name, avatar_url")
-      .or(`handle.ilike.%${query}%,display_name.ilike.%${query}%`)
-      .limit(20);
+    // Search every vendor (films, TV, games, music, books, art) + people.
+    const [hits, { data: peopleData }] = await Promise.all([
+      searchAllMedia(query),
+      supabase
+        .from("profiles")
+        .select("id, handle, display_name, avatar_url")
+        .or(`handle.ilike.%${query}%,display_name.ilike.%${query}%`)
+        .limit(20),
+    ]);
     const people = (peopleData ?? []) as Person[];
 
     return (
       <DiscoverShell query={query}>
-        <section className="mt-8">
-          <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
-            People
-          </h2>
-          {people.length > 0 ? (
+        {people.length > 0 && (
+          <section className="mt-8">
+            <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
+              People
+            </h2>
             <PeopleList people={people} />
-          ) : (
-            <p className="mt-3 text-sm text-white/50">No people found.</p>
-          )}
-        </section>
-        <section className="mt-10">
-          <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
-            Media
-          </h2>
-          {media.length > 0 ? (
-            <MediaGrid items={media} />
-          ) : (
-            <p className="mt-3 text-sm text-white/50">
-              No catalogued media matches — try a Search page to find new things.
-            </p>
-          )}
-        </section>
+          </section>
+        )}
+        <VendorResults hits={hits} />
       </DiscoverShell>
     );
   }
