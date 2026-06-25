@@ -1,15 +1,30 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/app/login/actions";
+import { HomeLibrary, type LibItem } from "./HomeLibrary";
 
-const MEDIA = [
-  { href: "/books", label: "Books", color: "#4FBF7A" },
-  { href: "/films", label: "Films", color: "#D94F4F" },
-  { href: "/tv", label: "TV", color: "#4F7ED9" },
-  { href: "/games", label: "Games", color: "#7A4FD9" },
-  { href: "/music", label: "Music", color: "#D94FB8" },
-  { href: "/art", label: "Art", color: "#BFA34F" },
+const ACCENT = "#F7A23B";
+
+const ADD = [
+  { href: "/books", label: "Books" },
+  { href: "/films", label: "Films" },
+  { href: "/tv", label: "TV" },
+  { href: "/games", label: "Games" },
+  { href: "/music", label: "Music" },
+  { href: "/art", label: "Art" },
 ];
+
+type LogRow = {
+  rating: number | null;
+  created_at: string;
+  media: {
+    id: string;
+    title: string;
+    creator: string | null;
+    cover_url: string | null;
+    media_type: string;
+  } | null;
+};
 
 export default async function Home() {
   const supabase = await createClient();
@@ -18,139 +33,152 @@ export default async function Home() {
   } = await supabase.auth.getUser();
 
   let unread = 0;
+  let items: LibItem[] = [];
+
   if (user) {
-    const { count } = await supabase
-      .from("notifications")
-      .select("id", { count: "exact", head: true })
-      .eq("recipient_id", user.id)
-      .eq("is_read", false);
+    const [{ count }, { data }] = await Promise.all([
+      supabase
+        .from("notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("recipient_id", user.id)
+        .eq("is_read", false),
+      supabase
+        .from("logs")
+        .select(
+          "rating, created_at, media:media_items(id, title, creator, cover_url, media_type)",
+        )
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false }),
+    ]);
     unread = count ?? 0;
+    items = ((data ?? []) as unknown as LogRow[])
+      .filter((r) => r.media)
+      .map((r) => ({
+        id: r.media!.id,
+        title: r.media!.title,
+        creator: r.media!.creator,
+        cover_url: r.media!.cover_url,
+        media_type: r.media!.media_type,
+        rating: r.rating,
+        created_at: r.created_at,
+      }));
   }
 
+  // Cover wall built from the user's own covers (repeated to fill the band).
+  const covers = items.map((i) => i.cover_url).filter(Boolean) as string[];
+  const wall = covers.length
+    ? Array.from({ length: 40 }, (_, i) => covers[i % covers.length])
+    : [];
+
   return (
-    <main className="min-h-screen bg-[#15130f] text-[#f5f3ee] flex items-center justify-center p-8">
-      <div className="w-full max-w-xl border border-white/10 rounded-lg p-8 bg-black/20">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Bookshelf</h1>
-            <p className="mt-1 text-sm text-white/50">
-              Your cultural ledger — everything you read, watch, play and hear.
-            </p>
-          </div>
-          {user && (
-            <form action={logout}>
-              <button className="rounded border border-white/15 px-3 py-1.5 text-xs font-medium text-white/70 hover:bg-white/5">
-                Log out
-              </button>
-            </form>
+    <main className="min-h-screen bg-[#0f0d0b] font-mono text-[#f5f3ee]">
+      {/* Top nav */}
+      <header className="relative z-20 flex flex-wrap items-center justify-between gap-x-5 gap-y-2 px-6 py-4 text-sm">
+        <nav className="flex flex-wrap gap-x-5 gap-y-1 text-white/60">
+          {user ? (
+            <>
+              <Link href="/feed" className="hover:text-white">Feed</Link>
+              <Link href="/discover" className="hover:text-white">Discover</Link>
+              <Link href="/recommendations" className="hover:text-white">For you</Link>
+              <Link href="/timeline" className="hover:text-white">Timeline</Link>
+              <Link href="/shelf" className="hover:text-white">Shelf</Link>
+              <Link href="/lists" className="hover:text-white">Lists</Link>
+              <Link href="/profile" className="hover:text-white">Profile</Link>
+            </>
+          ) : (
+            <span className="text-white/40">Your diary for everything you read, watch, play &amp; hear</span>
           )}
-        </div>
-
-        {user ? (
-          <div className="mt-8">
-            <h2 className="text-xs font-medium uppercase tracking-wide text-white/40">
-              Log something
-            </h2>
-            <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {MEDIA.map((m) => (
-                <Link
-                  key={m.href}
-                  href={m.href}
-                  className="flex items-center gap-2 rounded border border-white/10 bg-black/20 px-3 py-2.5 text-sm font-medium hover:border-white/30 hover:bg-white/5"
-                >
-                  <span
-                    className="h-2.5 w-2.5 shrink-0 rounded-full"
-                    style={{ background: m.color }}
-                  />
-                  {m.label}
-                </Link>
-              ))}
-            </div>
-
-            <h2 className="mt-8 text-xs font-medium uppercase tracking-wide text-white/40">
-              Your library
-            </h2>
-            <div className="mt-3 flex flex-wrap gap-3">
-              <Link
-                href="/feed"
-                className="rounded bg-[#f5f3ee] px-4 py-2 text-sm font-medium text-[#15130f] hover:bg-white"
-              >
-                Feed
-              </Link>
-              <Link
-                href="/discover"
-                className="rounded bg-[#f5f3ee] px-4 py-2 text-sm font-medium text-[#15130f] hover:bg-white"
-              >
-                Discover
-              </Link>
-              <Link
-                href="/recommendations"
-                className="rounded bg-[#f5f3ee] px-4 py-2 text-sm font-medium text-[#15130f] hover:bg-white"
-              >
-                For you
-              </Link>
-              <Link
-                href="/timeline"
-                className="rounded border border-white/20 px-4 py-2 text-sm font-medium hover:bg-white/5"
-              >
-                Timeline
-              </Link>
-              <Link
-                href="/shelf"
-                className="rounded border border-white/20 px-4 py-2 text-sm font-medium hover:bg-white/5"
-              >
-                My shelf
-              </Link>
-              <Link
-                href="/lists"
-                className="rounded border border-white/20 px-4 py-2 text-sm font-medium hover:bg-white/5"
-              >
-                Lists
-              </Link>
-              <Link
-                href="/notifications"
-                className="relative rounded border border-white/20 px-4 py-2 text-sm font-medium hover:bg-white/5"
-              >
+        </nav>
+        <div className="flex items-center gap-x-5">
+          {user ? (
+            <>
+              <Link href="/notifications" className="relative text-white/60 hover:text-white">
                 Notifications
                 {unread > 0 && (
-                  <span className="ml-1.5 rounded-full bg-[#D94F4F] px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                  <span className="ml-1 rounded-full bg-[#D94F4F] px-1.5 py-0.5 text-[10px] font-semibold text-white">
                     {unread}
                   </span>
                 )}
               </Link>
-              <Link
-                href="/profile"
-                className="rounded border border-white/20 px-4 py-2 text-sm font-medium hover:bg-white/5"
-              >
-                My profile
-              </Link>
-              <Link
-                href="/account"
-                className="rounded border border-white/20 px-4 py-2 text-sm font-medium hover:bg-white/5"
-              >
-                Settings
-              </Link>
-            </div>
+              <Link href="/account" className="text-white/60 hover:text-white">Settings</Link>
+              <form action={logout}>
+                <button className="text-white/60 hover:text-white">Log out</button>
+              </form>
+            </>
+          ) : (
+            <Link href="/login" className="text-white/80 hover:text-white">Login</Link>
+          )}
+        </div>
+      </header>
 
-            <p className="mt-8 text-xs text-white/30">
-              Signed in as {user.email}
-            </p>
-          </div>
-        ) : (
-          <div className="mt-8">
-            <div className="flex items-center gap-3">
-              <span className="inline-block h-3 w-3 rounded-full bg-white/30" />
-              <span className="text-sm text-white/70">Not logged in</span>
+      {/* Hero */}
+      <section className="relative">
+        {/* Cover wall + glow (top band only) */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[620px] overflow-hidden">
+          {wall.length > 0 && (
+            <div className="grid grid-cols-6 gap-1.5 opacity-[0.16] blur-[1px] sm:grid-cols-8 md:grid-cols-10">
+              {wall.map((src, i) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  key={i}
+                  src={src}
+                  alt=""
+                  className="aspect-[2/3] w-full object-cover"
+                />
+              ))}
             </div>
-            <Link
-              href="/login"
-              className="mt-6 inline-block rounded bg-[#f5f3ee] px-4 py-2 text-sm font-medium text-[#15130f] hover:bg-white"
-            >
-              Log in or sign up
-            </Link>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0f0d0b]/70 via-[#0f0d0b]/85 to-[#0f0d0b]" />
+          <div
+            className="absolute left-1/2 top-16 h-[440px] w-[860px] max-w-[95vw] -translate-x-1/2 rounded-full"
+            style={{
+              background:
+                "radial-gradient(ellipse at center, rgba(247,162,59,0.50), rgba(247,140,40,0.14) 45%, transparent 70%)",
+              filter: "blur(50px)",
+            }}
+          />
+        </div>
+
+        {/* Hero content */}
+        <div className="relative z-10 px-6 pt-12 text-center">
+          <h1
+            className="text-6xl font-extrabold tracking-tight sm:text-7xl"
+            style={{ color: ACCENT, textShadow: "0 0 45px rgba(247,162,59,0.55)" }}
+          >
+            Bookshelf
+          </h1>
+          <p className="mt-3 text-sm tracking-wide text-white/60">
+            Your diary for books · music · film · tv · games · art
+          </p>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-white/45">
+            <span className="text-white/30">Add to library:</span>
+            {ADD.map((m) => (
+              <Link key={m.href} href={m.href} className="hover:text-[#F7A23B]">
+                {m.label}
+              </Link>
+            ))}
           </div>
-        )}
-      </div>
+
+          {user ? (
+            <HomeLibrary items={items} />
+          ) : (
+            <div className="mx-auto mt-10 max-w-md">
+              <Link
+                href="/login"
+                className="inline-block rounded-lg px-6 py-3 text-sm font-semibold text-[#0f0d0b]"
+                style={{ background: ACCENT }}
+              >
+                Log in or sign up
+              </Link>
+              <p className="mt-4 text-xs text-white/40">
+                Log everything you read, watch, play and hear — in one colour-coded diary.
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <div className="h-16" />
     </main>
   );
 }
