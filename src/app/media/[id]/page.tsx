@@ -9,6 +9,7 @@ import { coverAspect, hiResCover } from "@/lib/format";
 import { ShareButton } from "../../_components/ShareButton";
 import { findSpotifyAlbum } from "@/lib/spotify";
 import { TrailerEmbed } from "../../_components/TrailerEmbed";
+import { pickEmbeddableYouTube } from "@/lib/youtube";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A", film: "#D94F4F", tv: "#4F7ED9",
@@ -76,7 +77,11 @@ export default async function MediaPage({
   const creatorLink = details?.creatorLink ?? null;
   const contributors = details?.contributors ?? [];
   const similar = details?.similar ?? [];
-  const trailerKey = details?.trailerKey ?? null;
+  const trailerKeys = details?.trailerKeys ?? [];
+  // Pick the first trailer that actually allows embedding (skip the ones that
+  // would show YouTube's "An error occurred" message).
+  const trailerKey =
+    trailerKeys.length > 0 ? await pickEmbeddableYouTube(trailerKeys) : null;
 
   // Spotify: embed a player for albums (when credentials are configured),
   // otherwise fall back to a "Listen on Spotify" search link.
@@ -302,7 +307,7 @@ export default async function MediaPage({
         )}
 
         {/* Trailer (films, TV, games) */}
-        {trailerKey &&
+        {trailerKeys.length > 0 &&
           (media.media_type === "film" ||
             media.media_type === "tv" ||
             media.media_type === "game") && (
@@ -310,7 +315,19 @@ export default async function MediaPage({
               <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
                 Trailer
               </h2>
-              <TrailerEmbed id={trailerKey} />
+              {trailerKey ? (
+                <TrailerEmbed id={trailerKey} />
+              ) : (
+                // No embeddable trailer — link out instead of a broken player.
+                <a
+                  href={`https://www.youtube.com/watch?v=${trailerKeys[0]}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#FF0000] px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
+                >
+                  ▶ Watch trailer on YouTube
+                </a>
+              )}
             </section>
           )}
 

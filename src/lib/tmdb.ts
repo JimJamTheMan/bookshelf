@@ -289,13 +289,16 @@ export async function getScreenDetails(
     .filter((x) => x.coverUrl)
     .slice(0, 12);
 
-  // Best YouTube trailer: prefer an official Trailer, then any Trailer, then any.
+  // Candidate YouTube trailers, best first (official trailers → trailers →
+  // teasers → anything). The page picks the first that allows embedding.
   const yt = (d.videos?.results ?? []).filter((v) => v.site === "YouTube" && v.key);
-  const trailer =
-    yt.find((v) => v.type === "Trailer" && v.official) ??
-    yt.find((v) => v.type === "Trailer") ??
-    yt.find((v) => v.type === "Teaser") ??
-    yt[0];
+  const ranked = [
+    ...yt.filter((v) => v.type === "Trailer" && v.official),
+    ...yt.filter((v) => v.type === "Trailer" && !v.official),
+    ...yt.filter((v) => v.type === "Teaser"),
+    ...yt.filter((v) => v.type !== "Trailer" && v.type !== "Teaser"),
+  ];
+  const trailerKeys = [...new Set(ranked.map((v) => v.key as string))].slice(0, 5);
 
   return {
     description: d.overview || null,
@@ -307,7 +310,7 @@ export async function getScreenDetails(
     crew,
     releases,
     similar,
-    trailerKey: trailer?.key ?? null,
+    trailerKeys,
   };
 }
 

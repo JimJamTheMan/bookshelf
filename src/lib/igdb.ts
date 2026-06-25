@@ -131,7 +131,10 @@ export async function getGameDetails(id: string): Promise<MediaDetails | null> {
   if (g.total_rating)
     facts.push({ label: "IGDB score", value: `${Math.round(g.total_rating)}/100` });
 
-  const trailerKey = (g.videos ?? []).find((v) => v.video_id)?.video_id ?? null;
+  const trailerKeys = (g.videos ?? [])
+    .map((v) => v.video_id)
+    .filter((v): v is string => !!v)
+    .slice(0, 5);
 
-  return { description: g.summary || g.storyline || null, facts, trailerKey };
+  return { description: g.summary || g.storyline || null, facts, trailerKeys };
 }
