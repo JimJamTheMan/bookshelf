@@ -306,7 +306,7 @@ export default async function MediaPage({
           (media.media_type === "film" ||
             media.media_type === "tv" ||
             media.media_type === "game") && (
-            <section className="mt-6">
+            <section className="mt-8">
               <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
                 Trailer
               </h2>
@@ -314,29 +314,33 @@ export default async function MediaPage({
             </section>
           )}
 
-        {/* Listen (music): YouTube + Spotify */}
+        {/* Listen (music): Spotify player + YouTube */}
         {media.media_type === "music" && (
-          <section className="mt-6">
+          <section className="mt-8">
+            <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
+              Listen
+            </h2>
             {spotify && (
-              <iframe
-                src={`https://open.spotify.com/embed/album/${spotify.id}?theme=0`}
-                width="100%"
-                height="152"
-                style={{ border: 0 }}
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                loading="lazy"
-                title="Spotify player"
-                className="rounded-xl"
-              />
+              <div className="mt-3 max-w-2xl overflow-hidden rounded-xl">
+                <iframe
+                  src={`https://open.spotify.com/embed/album/${spotify.id}?theme=0`}
+                  width="100%"
+                  height="152"
+                  style={{ border: 0 }}
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  loading="lazy"
+                  title="Spotify player"
+                />
+              </div>
             )}
-            <div className="mt-3 flex flex-wrap gap-3">
+            <div className="mt-3 flex flex-wrap gap-2">
               <a
                 href={youtubeSearchUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full bg-[#FF0000] px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
               >
-                ▶ Play on YouTube
+                ▶ YouTube
               </a>
               {!spotify && (
                 <a
@@ -353,7 +357,7 @@ export default async function MediaPage({
         )}
 
         {facts.length > 0 && (
-          <dl className="mt-6 grid grid-cols-1 gap-x-8 gap-y-2 sm:grid-cols-2">
+          <dl className="mt-8 grid grid-cols-1 gap-x-8 gap-y-2 sm:grid-cols-2">
             {facts.map((f) => (
               <div key={f.label} className="flex gap-2 text-sm">
                 <dt className="shrink-0 text-white/40">{f.label}:</dt>
