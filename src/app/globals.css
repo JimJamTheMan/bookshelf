@@ -15,12 +15,40 @@
   --color-surface: var(--surface);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-fraunces);
 }
 
+/* Warm, cosy "cafe bookshelf" lighting layered over the base colour. */
 body {
-  background: var(--background);
+  background:
+    radial-gradient(
+      1100px 520px at 50% -8%,
+      rgba(232, 197, 143, 0.1),
+      transparent 62%
+    ),
+    radial-gradient(
+      800px 600px at 110% 0%,
+      rgba(210, 106, 42, 0.1),
+      transparent 60%
+    ),
+    radial-gradient(
+      900px 700px at -10% 110%,
+      rgba(98, 44, 33, 0.32),
+      transparent 60%
+    ),
+    var(--background);
+  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Warm serif for headings — the printed-book feel. */
+@layer base {
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  }
 }
 
 html {

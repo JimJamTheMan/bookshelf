@@ -110,7 +110,7 @@ export function SiteNav({
       <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
         <Link
           href="/"
-          className="mr-1 font-mono text-lg font-extrabold tracking-tight"
+          className="mr-1 font-serif text-xl font-extrabold tracking-tight"
           style={{ color: "#d26a2a", textShadow: "0 0 18px rgba(210,106,42,0.5)" }}
         >
           Bookshelf

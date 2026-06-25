@@ -94,7 +94,7 @@ export default async function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#200f0a] font-mono text-[#e8c58f]">
+    <main className="min-h-screen text-[#e8c58f]">
       {/* Hero */}
       <section className="relative">
         {/* Bookshelf background image + glow (top band only) */}
@@ -117,7 +117,7 @@ export default async function Home() {
           {user ? (
             <>
               {/* Goodreads-style stats strip */}
-              <div className="mx-auto mt-8 grid max-w-3xl grid-cols-2 gap-3 font-mono sm:grid-cols-4">
+              <div className="mx-auto mt-8 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
                 {[
                   { label: "Logged", value: String(stats.total) },
                   { label: "This year", value: String(stats.thisYear) },
@@ -147,7 +147,7 @@ export default async function Home() {
               {/* Currently — what you're in the middle of (Goodreads-style) */}
               {currently.length > 0 && (
                 <section className="mx-auto mt-10 max-w-6xl px-6 text-left">
-                  <h2 className="font-mono text-lg font-bold" style={{ color: ACCENT }}>
+                  <h2 className="text-lg font-bold" style={{ color: ACCENT }}>
                     Currently
                   </h2>
                   <ul className="mt-3 flex gap-4 overflow-x-auto pb-2">

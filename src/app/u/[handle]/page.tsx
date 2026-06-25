@@ -116,7 +116,7 @@ export default async function PublicProfilePage({
   const shelf = (shelfData ?? []) as unknown as ShelfRow[];
 
   return (
-    <main className="min-h-screen bg-[#200f0a] text-[#e8c58f] flex items-center justify-center p-8">
+    <main className="min-h-screen text-[#e8c58f] flex items-center justify-center p-8">
       <div className="w-full max-w-lg overflow-hidden rounded-lg border border-white/10 bg-black/20">
         {/* Banner */}
         <div

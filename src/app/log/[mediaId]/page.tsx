@@ -103,7 +103,7 @@ export default async function LogPage({
   const isFeatured = ((me?.featured_media as string[]) ?? []).includes(mediaId);
 
   return (
-    <main className="min-h-screen bg-[#200f0a] text-[#e8c58f] px-4 py-8 sm:p-8">
+    <main className="min-h-screen text-[#e8c58f] px-4 py-8 sm:p-8">
       <div className="mx-auto max-w-lg">
         <Link
           href={SEARCH_PATH[media.media_type] ?? "/"}

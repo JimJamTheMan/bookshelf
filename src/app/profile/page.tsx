@@ -27,7 +27,7 @@ export default async function ProfilePage({
     .single();
 
   return (
-    <main className="min-h-screen bg-[#200f0a] text-[#e8c58f] flex items-center justify-center p-8">
+    <main className="min-h-screen text-[#e8c58f] flex items-center justify-center p-8">
       <div className="w-full max-w-lg border border-white/10 rounded-lg p-8 bg-black/20">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">Your profile</h1>

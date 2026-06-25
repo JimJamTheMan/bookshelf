@@ -60,7 +60,7 @@ export function HomeLibrary({ items }: { items: LibItem[] }) {
   }, [items, tab, q]);
 
   return (
-    <div className="font-mono">
+    <div>
       {/* Search */}
       <div className="mx-auto mt-8 flex max-w-2xl items-center gap-3 rounded-xl border border-white/15 bg-black/40 px-4 py-3 backdrop-blur focus-within:border-[#d26a2a]/70">
         <span className="text-white/40">⌕</span>

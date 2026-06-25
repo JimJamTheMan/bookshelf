@@ -243,7 +243,7 @@ export default async function MediaPage({
   const heroImg = backdropUrl ?? media.cover_url;
 
   return (
-    <main className="min-h-screen bg-[#200f0a] text-[#e8c58f]">
+    <main className="min-h-screen text-[#e8c58f]">
       {/* Hero — real backdrop for films/TV, blurred cover for everything else */}
       {heroImg ? (
         <div className="relative">

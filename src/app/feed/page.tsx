@@ -83,7 +83,7 @@ export default async function FeedPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#200f0a] text-[#e8c58f] px-4 py-8 sm:p-8">
+    <main className="min-h-screen text-[#e8c58f] px-4 py-8 sm:p-8">
       <div className="mx-auto max-w-2xl">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">Feed</h1>
