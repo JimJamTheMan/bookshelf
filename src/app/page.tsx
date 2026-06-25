@@ -64,11 +64,18 @@ export default async function Home() {
       }));
   }
 
-  // Cover wall built from the user's own covers (repeated to fill the band).
+  // Bookshelf wall built from the user's own covers (repeated to fill, then
+  // split into rows that each sit on a wooden shelf ledge).
   const covers = items.map((i) => i.cover_url).filter(Boolean) as string[];
+  const PER_ROW = 18;
+  const ROWS = 6;
   const wall = covers.length
-    ? Array.from({ length: 40 }, (_, i) => covers[i % covers.length])
+    ? Array.from({ length: PER_ROW * ROWS }, (_, i) => covers[i % covers.length])
     : [];
+  const shelfRows: string[][] = [];
+  for (let i = 0; i < wall.length; i += PER_ROW) {
+    shelfRows.push(wall.slice(i, i + PER_ROW));
+  }
 
   return (
     <main className="min-h-screen bg-[#0f0d0b] font-mono text-[#f5f3ee]">
@@ -113,28 +120,55 @@ export default async function Home() {
 
       {/* Hero */}
       <section className="relative">
-        {/* Cover wall + glow (top band only) */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-[620px] overflow-hidden">
-          {wall.length > 0 && (
-            <div className="grid grid-cols-6 gap-1.5 opacity-[0.16] blur-[1px] sm:grid-cols-8 md:grid-cols-10">
-              {wall.map((src, i) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  key={i}
-                  src={src}
-                  alt=""
-                  className="aspect-[2/3] w-full object-cover"
-                />
+        {/* Bookshelf wall + glow (top band only) */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[700px] overflow-hidden">
+          {/* warm wood backing fills the whole band, even behind empty edges */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#2a1a10] via-[#1c1209] to-[#0f0d0b]" />
+
+          {shelfRows.length > 0 && (
+            <div
+              className="absolute inset-x-0 top-0"
+              style={{
+                transform: "perspective(1700px) rotateX(5deg)",
+                transformOrigin: "top center",
+              }}
+            >
+              {shelfRows.map((row, r) => (
+                <div key={r} className="relative">
+                  <div className="flex items-end justify-center gap-1 px-2">
+                    {row.map((src, i) => (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        key={i}
+                        src={src}
+                        alt=""
+                        className="h-[104px] w-[68px] rounded-[2px] object-cover shadow-[0_10px_12px_-3px_rgba(0,0,0,0.75)]"
+                      />
+                    ))}
+                  </div>
+                  {/* wooden shelf ledge the books stand on */}
+                  <div
+                    className="h-3 w-full"
+                    style={{
+                      background:
+                        "linear-gradient(to bottom, #8a5733 0%, #5a3a22 30%, #341f12 70%, #160d07 100%)",
+                      boxShadow: "0 7px 11px -2px rgba(0,0,0,0.8)",
+                    }}
+                  />
+                </div>
               ))}
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0f0d0b]/70 via-[#0f0d0b]/85 to-[#0f0d0b]" />
+
+          {/* darken + fade to page colour so the title reads clearly */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0f0d0b]/80 via-[#0f0d0b]/30 to-[#0f0d0b]" />
+          {/* warm orange glow behind the title */}
           <div
-            className="absolute left-1/2 top-16 h-[440px] w-[860px] max-w-[95vw] -translate-x-1/2 rounded-full"
+            className="absolute left-1/2 top-10 h-[440px] w-[860px] max-w-[95vw] -translate-x-1/2 rounded-full"
             style={{
               background:
                 "radial-gradient(ellipse at center, rgba(247,162,59,0.50), rgba(247,140,40,0.14) 45%, transparent 70%)",
-              filter: "blur(50px)",
+              filter: "blur(55px)",
             }}
           />
         </div>
