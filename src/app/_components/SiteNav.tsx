@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { logout } from "@/app/login/actions";
+import { NavSearch } from "./NavSearch";
 
 const PRIMARY = [
   { href: "/feed", label: "Activity" },
@@ -121,19 +122,8 @@ export function SiteNav({
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
-          {/* Persistent search → Discover */}
-          <form
-            action="/discover"
-            method="get"
-            className="hidden items-center gap-2 rounded-lg border border-white/15 bg-black/30 px-3 py-1.5 focus-within:border-[#d26a2a]/70 sm:flex"
-          >
-            <span className="text-white/40">⌕</span>
-            <input
-              name="q"
-              placeholder="Search…"
-              className="w-28 bg-transparent text-sm outline-none placeholder:text-white/40 md:w-44"
-            />
-          </form>
+          {/* Discogs-style search: category dropdown + box */}
+          <NavSearch className="hidden w-72 sm:flex md:w-80" />
 
           {signedIn ? (
             <>
@@ -256,18 +246,7 @@ export function SiteNav({
       {/* Mobile menu */}
       {signedIn && mobile && (
         <div className="border-t border-white/10 px-4 py-3 md:hidden">
-          <form
-            action="/discover"
-            method="get"
-            className="mb-3 flex items-center gap-2 rounded-lg border border-white/15 bg-black/30 px-3 py-2"
-          >
-            <span className="text-white/40">⌕</span>
-            <input
-              name="q"
-              placeholder="Search…"
-              className="flex-1 bg-transparent text-sm outline-none placeholder:text-white/40"
-            />
-          </form>
+          <NavSearch className="mb-3 flex w-full" />
           <div className="grid grid-cols-2 gap-1">
             {[
               ...PRIMARY,
