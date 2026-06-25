@@ -115,7 +115,7 @@ export default async function PublicProfilePage({
   const shelf = (shelfData ?? []) as unknown as ShelfRow[];
 
   return (
-    <main className="min-h-screen bg-[#15130f] text-[#f5f3ee] flex items-center justify-center p-8">
+    <main className="min-h-screen bg-[#200f0a] text-[#e8c58f] flex items-center justify-center p-8">
       <div className="w-full max-w-lg overflow-hidden rounded-lg border border-white/10 bg-black/20">
         {/* Banner */}
         <div
@@ -123,7 +123,7 @@ export default async function PublicProfilePage({
           style={
             profile.banner_url
               ? undefined
-              : { background: `linear-gradient(135deg, ${accent}66, #15130f)` }
+              : { background: `linear-gradient(135deg, ${accent}66, #200f0a)` }
           }
         >
           {profile.banner_url && (
@@ -151,12 +151,12 @@ export default async function PublicProfilePage({
                 src={profile.avatar_url}
                 alt=""
                 className="h-20 w-20 rounded-full object-cover border-4"
-                style={{ borderColor: "#15130f", boxShadow: `0 0 0 2px ${accent}` }}
+                style={{ borderColor: "#200f0a", boxShadow: `0 0 0 2px ${accent}` }}
               />
             ) : (
               <div
                 className="h-20 w-20 rounded-full border-4"
-                style={{ background: accent, borderColor: "#15130f" }}
+                style={{ background: accent, borderColor: "#200f0a" }}
               />
             )}
           </div>
@@ -177,7 +177,7 @@ export default async function PublicProfilePage({
                   className={
                     isFollowing
                       ? "rounded border border-white/20 px-4 py-2 text-sm font-medium hover:bg-white/5"
-                      : "rounded bg-[#f5f3ee] px-4 py-2 text-sm font-medium text-[#15130f] hover:bg-white"
+                      : "rounded bg-[#e8c58f] px-4 py-2 text-sm font-medium text-[#200f0a] hover:bg-white"
                   }
                 >
                   {isFollowing ? "Following" : "Follow"}

@@ -189,7 +189,7 @@ function DiscoverShell({
   children: React.ReactNode;
 }) {
   return (
-    <main className="min-h-screen bg-[#15130f] text-[#f5f3ee] px-4 py-8 sm:p-8">
+    <main className="min-h-screen bg-[#200f0a] text-[#e8c58f] px-4 py-8 sm:p-8">
       <div className="mx-auto max-w-5xl">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">Discover</h1>
@@ -206,7 +206,7 @@ function DiscoverShell({
             placeholder="Search the catalogue and people…"
             className="flex-1 rounded border border-white/15 bg-black/30 px-3 py-2 text-sm outline-none focus:border-white/40"
           />
-          <button className="rounded bg-[#f5f3ee] px-4 py-2 text-sm font-medium text-[#15130f] hover:bg-white">
+          <button className="rounded bg-[#e8c58f] px-4 py-2 text-sm font-medium text-[#200f0a] hover:bg-white">
             Search
           </button>
         </form>

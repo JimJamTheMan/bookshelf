@@ -27,7 +27,7 @@ export default async function ProfilePage({
     .single();
 
   return (
-    <main className="min-h-screen bg-[#15130f] text-[#f5f3ee] flex items-center justify-center p-8">
+    <main className="min-h-screen bg-[#200f0a] text-[#e8c58f] flex items-center justify-center p-8">
       <div className="w-full max-w-lg border border-white/10 rounded-lg p-8 bg-black/20">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">Your profile</h1>
@@ -124,7 +124,7 @@ export default async function ProfilePage({
             />
           </label>
 
-          <button className="mt-2 self-start rounded bg-[#f5f3ee] px-4 py-2 text-sm font-medium text-[#15130f] hover:bg-white">
+          <button className="mt-2 self-start rounded bg-[#e8c58f] px-4 py-2 text-sm font-medium text-[#200f0a] hover:bg-white">
             Save profile
           </button>
         </form>

@@ -6,7 +6,7 @@ import { Cover } from "./_components/Cover";
 import { statusLabel } from "@/lib/status";
 import { coverAspect } from "@/lib/format";
 
-const ACCENT = "#F7A23B";
+const ACCENT = "#d26a2a";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A",
@@ -102,7 +102,7 @@ export default async function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#15130f] font-mono text-[#f5f3ee]">
+    <main className="min-h-screen bg-[#200f0a] font-mono text-[#e8c58f]">
       {/* Hero */}
       <section className="relative">
         {/* Bookshelf background image + glow (top band only) */}
@@ -112,7 +112,7 @@ export default async function Home() {
         <div className="relative z-10 px-6 pt-12 text-center">
           <h1
             className="text-5xl font-extrabold tracking-tight sm:text-6xl md:text-7xl"
-            style={{ color: ACCENT, textShadow: "0 0 45px rgba(247,162,59,0.55)" }}
+            style={{ color: ACCENT, textShadow: "0 0 45px rgba(210,106,42,0.55)" }}
           >
             Bookshelf
           </h1>
@@ -122,7 +122,7 @@ export default async function Home() {
           <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-white/45">
             <span className="text-white/30">Add to library:</span>
             {ADD.map((m) => (
-              <Link key={m.href} href={m.href} className="hover:text-[#F7A23B]">
+              <Link key={m.href} href={m.href} className="hover:text-[#d26a2a]">
                 {m.label}
               </Link>
             ))}
@@ -204,7 +204,7 @@ export default async function Home() {
               <div className="flex flex-wrap items-center justify-center gap-3">
                 <Link
                   href="/login"
-                  className="inline-block rounded-lg px-6 py-3 text-sm font-semibold text-[#15130f]"
+                  className="inline-block rounded-lg px-6 py-3 text-sm font-semibold text-[#200f0a]"
                   style={{ background: ACCENT }}
                 >
                   Log in or sign up

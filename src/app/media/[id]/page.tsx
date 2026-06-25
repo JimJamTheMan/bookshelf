@@ -112,14 +112,14 @@ export default async function MediaPage({
   const logBtn = user ? (
     <Link
       href={`/log/${media.id}`}
-      className="inline-block rounded bg-[#f5f3ee] px-4 py-2 text-sm font-medium text-[#15130f] hover:bg-white"
+      className="inline-block rounded bg-[#e8c58f] px-4 py-2 text-sm font-medium text-[#200f0a] hover:bg-white"
     >
       {myLog ? "Edit your log" : "Log this"}
     </Link>
   ) : (
     <Link
       href="/login"
-      className="inline-block rounded bg-[#f5f3ee] px-4 py-2 text-sm font-medium text-[#15130f] hover:bg-white"
+      className="inline-block rounded bg-[#e8c58f] px-4 py-2 text-sm font-medium text-[#200f0a] hover:bg-white"
     >
       Log in to add this
     </Link>
@@ -218,7 +218,7 @@ export default async function MediaPage({
   const heroImg = backdropUrl ?? media.cover_url;
 
   return (
-    <main className="min-h-screen bg-[#15130f] text-[#f5f3ee]">
+    <main className="min-h-screen bg-[#200f0a] text-[#e8c58f]">
       {/* Hero — real backdrop for films/TV, blurred cover for everything else */}
       {heroImg ? (
         <div className="relative">
@@ -231,7 +231,7 @@ export default async function MediaPage({
                 backdropUrl ? "" : "scale-125 blur-2xl"
               }`}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#15130f] via-[#15130f]/80 to-[#15130f]/40" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#200f0a] via-[#200f0a]/80 to-[#200f0a]/40" />
           </div>
           <div className="relative mx-auto max-w-3xl px-4 sm:px-8 pb-6 pt-6">
             <Link

@@ -47,7 +47,7 @@ function Avatar({ name, url }: { name: string | null; url: string | null }) {
   }
   const initial = (name ?? "?").trim().charAt(0).toUpperCase() || "?";
   return (
-    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f7a23b] text-sm font-bold text-[#15130f]">
+    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#d26a2a] text-sm font-bold text-[#200f0a]">
       {initial}
     </span>
   );
@@ -104,12 +104,12 @@ export function SiteNav({
   );
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#15130f]/85 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#200f0a]/85 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
         <Link
           href="/"
           className="mr-1 font-mono text-lg font-extrabold tracking-tight"
-          style={{ color: "#f7a23b", textShadow: "0 0 18px rgba(247,162,59,0.5)" }}
+          style={{ color: "#d26a2a", textShadow: "0 0 18px rgba(210,106,42,0.5)" }}
         >
           Bookshelf
         </Link>
@@ -123,7 +123,7 @@ export function SiteNav({
           <form
             action="/discover"
             method="get"
-            className="hidden items-center gap-2 rounded-lg border border-white/15 bg-black/30 px-3 py-1.5 focus-within:border-[#f7a23b]/70 sm:flex"
+            className="hidden items-center gap-2 rounded-lg border border-white/15 bg-black/30 px-3 py-1.5 focus-within:border-[#d26a2a]/70 sm:flex"
           >
             <span className="text-white/40">⌕</span>
             <input
@@ -148,7 +148,7 @@ export function SiteNav({
                   + Log
                 </button>
                 {logMenu && (
-                  <div className="absolute right-0 z-50 mt-2 w-44 rounded-lg border border-white/10 bg-[#1c1812] p-1 shadow-xl">
+                  <div className="absolute right-0 z-50 mt-2 w-44 rounded-lg border border-white/10 bg-[#622c21] p-1 shadow-xl">
                     <p className="px-3 py-1 text-[11px] uppercase tracking-wide text-white/35">
                       Log something
                     </p>
@@ -182,7 +182,7 @@ export function SiteNav({
                   )}
                 </button>
                 {acct && (
-                  <div className="absolute right-0 z-50 mt-2 w-56 rounded-lg border border-white/10 bg-[#1c1812] p-1 shadow-xl">
+                  <div className="absolute right-0 z-50 mt-2 w-56 rounded-lg border border-white/10 bg-[#622c21] p-1 shadow-xl">
                     <Link
                       href={handle ? `/u/${handle}` : "/profile"}
                       className="block rounded px-3 py-2 hover:bg-white/5"

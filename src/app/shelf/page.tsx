@@ -66,7 +66,7 @@ export default async function ShelfPage({
   }
 
   return (
-    <main className="min-h-screen bg-[#15130f] text-[#f5f3ee] px-4 py-8 sm:p-8">
+    <main className="min-h-screen bg-[#200f0a] text-[#e8c58f] px-4 py-8 sm:p-8">
       <div className="mx-auto max-w-5xl">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">My shelf</h1>
@@ -83,7 +83,7 @@ export default async function ShelfPage({
             placeholder="Search your shelf by title or creator…"
             className="flex-1 rounded border border-white/15 bg-black/30 px-3 py-2 text-sm outline-none focus:border-white/40"
           />
-          <button className="rounded bg-[#f5f3ee] px-4 py-2 text-sm font-medium text-[#15130f] hover:bg-white">
+          <button className="rounded bg-[#e8c58f] px-4 py-2 text-sm font-medium text-[#200f0a] hover:bg-white">
             Search
           </button>
           {query && (
@@ -111,7 +111,7 @@ export default async function ShelfPage({
                 <p>Your shelf is empty.</p>
                 <Link
                   href="/books"
-                  className="mt-4 inline-block rounded bg-[#f5f3ee] px-4 py-2 font-medium text-[#15130f] hover:bg-white"
+                  className="mt-4 inline-block rounded bg-[#e8c58f] px-4 py-2 font-medium text-[#200f0a] hover:bg-white"
                 >
                   Search for something to log
                 </Link>
@@ -147,7 +147,7 @@ export default async function ShelfPage({
                             style={{
                               background: `linear-gradient(160deg, ${
                                 MEDIA_COLOR[row.media.media_type] ?? "#888"
-                              }33, #15130f)`,
+                              }33, #200f0a)`,
                             }}
                           >
                             {row.media.title}

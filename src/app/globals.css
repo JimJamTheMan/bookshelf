@@ -1,16 +1,18 @@
 @import "tailwindcss";
 
 :root {
-  --background: #15130f;
-  --foreground: #f5f3ee;
-  --accent: #f7a23b;
-  --accent-strong: #ff8c2a;
+  --background: #200f0a;
+  --surface: #622c21;
+  --foreground: #e8c58f;
+  --accent: #d26a2a;
+  --accent-strong: #b5461d;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-accent: var(--accent);
+  --color-surface: var(--surface);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -43,7 +45,7 @@ summary {
 }
 
 ::selection {
-  background: rgba(247, 162, 59, 0.35);
+  background: rgba(210, 106, 42, 0.35);
   color: #fff;
 }
 
@@ -55,27 +57,27 @@ summary {
 /* Warm themed scrollbar */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(247, 162, 59, 0.4) transparent;
+  scrollbar-color: rgba(210, 106, 42, 0.45) transparent;
 }
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(247, 162, 59, 0.3);
+  background: rgba(210, 106, 42, 0.35);
   border-radius: 9999px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(247, 162, 59, 0.55);
+  background: rgba(210, 106, 42, 0.6);
   background-clip: padding-box;
 }
 
 /* Reusable, on-theme component classes */
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-[#15130f];
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-[#200f0a];
     background: var(--accent);
   }
   .btn-primary:hover {
@@ -99,6 +101,6 @@ summary {
   }
   .tile:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 24px -8px rgba(247, 162, 59, 0.45);
+    box-shadow: 0 10px 24px -8px rgba(210, 106, 42, 0.45);
   }
 }

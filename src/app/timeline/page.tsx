@@ -77,7 +77,7 @@ export default async function TimelinePage() {
   const rows = (data ?? []) as unknown as Row[];
 
   return (
-    <main className="min-h-screen bg-[#15130f] text-[#f5f3ee] px-4 py-8 sm:p-8">
+    <main className="min-h-screen bg-[#200f0a] text-[#e8c58f] px-4 py-8 sm:p-8">
       <div className="mx-auto max-w-2xl">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">Timeline</h1>
@@ -94,7 +94,7 @@ export default async function TimelinePage() {
             <p>Nothing logged yet.</p>
             <Link
               href="/"
-              className="mt-4 inline-block rounded bg-[#f5f3ee] px-4 py-2 font-medium text-[#15130f] hover:bg-white"
+              className="mt-4 inline-block rounded bg-[#e8c58f] px-4 py-2 font-medium text-[#200f0a] hover:bg-white"
             >
               Log something
             </Link>

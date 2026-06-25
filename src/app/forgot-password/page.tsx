@@ -9,7 +9,7 @@ export default async function ForgotPasswordPage({
   const { error, message } = await searchParams;
 
   return (
-    <main className="min-h-screen bg-[#15130f] text-[#f5f3ee] flex items-center justify-center p-8">
+    <main className="min-h-screen bg-[#200f0a] text-[#e8c58f] flex items-center justify-center p-8">
       <div className="w-full max-w-sm border border-white/10 rounded-lg p-8 bg-black/20">
         <h1 className="text-2xl font-semibold tracking-tight">Reset password</h1>
         <p className="mt-1 text-sm text-white/50">
@@ -39,7 +39,7 @@ export default async function ForgotPasswordPage({
             />
           </label>
 
-          <button className="rounded bg-[#f5f3ee] px-4 py-2 text-sm font-medium text-[#15130f] hover:bg-white">
+          <button className="rounded bg-[#e8c58f] px-4 py-2 text-sm font-medium text-[#200f0a] hover:bg-white">
             Send reset link
           </button>
         </form>

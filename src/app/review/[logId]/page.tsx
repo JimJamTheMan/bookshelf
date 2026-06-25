@@ -90,7 +90,7 @@ export default async function ReviewPage({
   const color = MEDIA_COLOR[media.media_type] ?? "#888";
 
   return (
-    <main className="min-h-screen bg-[#15130f] text-[#f5f3ee] px-4 py-8 sm:p-8">
+    <main className="min-h-screen bg-[#200f0a] text-[#e8c58f] px-4 py-8 sm:p-8">
       <div className="mx-auto max-w-2xl">
         <Link href="/feed" className="text-sm text-white/50 hover:text-white/80">
           ← Feed
@@ -165,7 +165,7 @@ export default async function ReviewPage({
               placeholder="Add a comment…"
               className="rounded border border-white/15 bg-black/30 px-3 py-2 text-sm outline-none focus:border-white/40 resize-y"
             />
-            <button className="self-start rounded bg-[#f5f3ee] px-4 py-2 text-sm font-medium text-[#15130f] hover:bg-white">
+            <button className="self-start rounded bg-[#e8c58f] px-4 py-2 text-sm font-medium text-[#200f0a] hover:bg-white">
               Comment
             </button>
           </form>

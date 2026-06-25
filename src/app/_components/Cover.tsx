@@ -20,7 +20,7 @@ export function Cover({
     return (
       <div
         className="flex h-full w-full items-center justify-center p-2 text-center text-xs text-white/80"
-        style={{ background: `linear-gradient(160deg, ${color}33, #15130f)` }}
+        style={{ background: `linear-gradient(160deg, ${color}33, #200f0a)` }}
       >
         {title}
       </div>

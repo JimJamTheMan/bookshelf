@@ -103,7 +103,7 @@ export default async function LogPage({
   const isFeatured = ((me?.featured_media as string[]) ?? []).includes(mediaId);
 
   return (
-    <main className="min-h-screen bg-[#15130f] text-[#f5f3ee] px-4 py-8 sm:p-8">
+    <main className="min-h-screen bg-[#200f0a] text-[#e8c58f] px-4 py-8 sm:p-8">
       <div className="mx-auto max-w-lg">
         <Link
           href={SEARCH_PATH[media.media_type] ?? "/"}
@@ -212,7 +212,7 @@ export default async function LogPage({
           </label>
 
           <div className="mt-2 flex items-center gap-3">
-            <button className="self-start rounded bg-[#f5f3ee] px-4 py-2 text-sm font-medium text-[#15130f] hover:bg-white">
+            <button className="self-start rounded bg-[#e8c58f] px-4 py-2 text-sm font-medium text-[#200f0a] hover:bg-white">
               {existing ? "Update log" : "Save to shelf"}
             </button>
             {existing && (

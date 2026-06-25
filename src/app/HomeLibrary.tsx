@@ -6,7 +6,7 @@ import { Cover } from "./_components/Cover";
 import { starsFromRating } from "@/lib/stars";
 import { coverAspect } from "@/lib/format";
 
-const ACCENT = "#F7A23B";
+const ACCENT = "#d26a2a";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A", film: "#D94F4F", tv: "#4F7ED9",
@@ -62,7 +62,7 @@ export function HomeLibrary({ items }: { items: LibItem[] }) {
   return (
     <div className="font-mono">
       {/* Search */}
-      <div className="mx-auto mt-8 flex max-w-2xl items-center gap-3 rounded-xl border border-white/15 bg-black/40 px-4 py-3 backdrop-blur focus-within:border-[#F7A23B]/70">
+      <div className="mx-auto mt-8 flex max-w-2xl items-center gap-3 rounded-xl border border-white/15 bg-black/40 px-4 py-3 backdrop-blur focus-within:border-[#d26a2a]/70">
         <span className="text-white/40">⌕</span>
         <input
           value={q}

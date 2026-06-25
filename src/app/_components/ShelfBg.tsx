@@ -9,7 +9,7 @@ export function ShelfBg() {
 
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 h-[700px] overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-[#2a1a10] via-[#1c1209] to-[#15130f]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#2a1a10] via-[#1c1209] to-[#200f0a]" />
 
       {ok && (
         // eslint-disable-next-line @next/next/no-img-element
@@ -21,12 +21,12 @@ export function ShelfBg() {
         />
       )}
 
-      <div className="absolute inset-0 bg-gradient-to-b from-[#15130f]/75 via-[#15130f]/30 to-[#15130f]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#200f0a]/75 via-[#200f0a]/30 to-[#200f0a]" />
       <div
         className="absolute left-1/2 top-6 h-[440px] w-[860px] max-w-[95vw] -translate-x-1/2 rounded-full"
         style={{
           background:
-            "radial-gradient(ellipse at center, rgba(247,162,59,0.50), rgba(247,140,40,0.14) 45%, transparent 70%)",
+            "radial-gradient(ellipse at center, rgba(210,106,42,0.50), rgba(165,46,25,0.14) 45%, transparent 70%)",
           filter: "blur(55px)",
         }}
       />
