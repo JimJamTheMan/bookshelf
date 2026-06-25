@@ -35,7 +35,6 @@ const ACCOUNT = [
   { href: "/shelf", label: "Shelf" },
   { href: "/timeline", label: "Timeline" },
   { href: "/recommendations", label: "For you" },
-  { href: "/lists", label: "Lists" },
   { href: "/account", label: "Settings" },
 ];
 
