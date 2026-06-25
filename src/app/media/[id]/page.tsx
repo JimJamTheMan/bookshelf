@@ -8,6 +8,7 @@ import { openMedia } from "@/app/media-actions";
 import { coverAspect, hiResCover } from "@/lib/format";
 import { ShareButton } from "../../_components/ShareButton";
 import { findSpotifyAlbum } from "@/lib/spotify";
+import { TrailerEmbed } from "../../_components/TrailerEmbed";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A", film: "#D94F4F", tv: "#4F7ED9",
@@ -309,26 +310,7 @@ export default async function MediaPage({
               <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
                 Trailer
               </h2>
-              {/* A thumbnail that opens YouTube — reliable even when a video
-                  blocks embedding (which shows an in-player error otherwise). */}
-              <a
-                href={`https://www.youtube.com/watch?v=${trailerKey}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group relative mt-3 block aspect-video w-full max-w-2xl overflow-hidden rounded-xl border border-white/10"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={`https://i.ytimg.com/vi/${trailerKey}/hqdefault.jpg`}
-                  alt="Trailer thumbnail"
-                  className="h-full w-full object-cover transition group-hover:scale-105"
-                />
-                <span className="absolute inset-0 flex items-center justify-center bg-black/30 transition group-hover:bg-black/20">
-                  <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#FF0000] text-xl text-white shadow-lg">
-                    ▶
-                  </span>
-                </span>
-              </a>
+              <TrailerEmbed id={trailerKey} />
             </section>
           )}
 
