@@ -179,7 +179,9 @@ export async function getScreenDetails(
   if (!token || token.startsWith("PASTE_")) return null;
 
   const isTv = mediaType === "tv";
-  const append = isTv ? "credits,similar" : "credits,release_dates,similar";
+  const append = isTv
+    ? "credits,recommendations,similar"
+    : "credits,release_dates,recommendations,similar";
   const url = `https://api.themoviedb.org/3/${isTv ? "tv" : "movie"}/${id}?append_to_response=${append}`;
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
@@ -211,6 +213,7 @@ export async function getScreenDetails(
         }[];
       }[];
     };
+    recommendations?: { results?: RawWork[] };
     similar?: { results?: RawWork[] };
   };
 
@@ -262,7 +265,11 @@ export async function getScreenDetails(
     .filter((x): x is { region: string; date: string; cert: string | null } => !!x)
     .sort((a, b) => a.date.localeCompare(b.date));
 
-  const similar = (d.similar?.results ?? [])
+  // Prefer TMDb's "recommendations" (much better) over "similar".
+  const relatedRaw = (d.recommendations?.results ?? []).length
+    ? (d.recommendations?.results ?? [])
+    : (d.similar?.results ?? []);
+  const similar = relatedRaw
     .map((w) => ({
       mediaType: isTv ? "tv" : "film",
       source: "tmdb",
