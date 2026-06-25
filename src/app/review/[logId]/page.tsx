@@ -89,7 +89,7 @@ export default async function ReviewPage({
   const color = MEDIA_COLOR[media.media_type] ?? "#888";
 
   return (
-    <main className="min-h-screen bg-[#15130f] text-[#f5f3ee] p-8">
+    <main className="min-h-screen bg-[#15130f] text-[#f5f3ee] px-4 py-8 sm:p-8">
       <div className="mx-auto max-w-2xl">
         <Link href="/feed" className="text-sm text-white/50 hover:text-white/80">
           ← Feed

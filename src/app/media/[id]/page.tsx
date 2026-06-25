@@ -233,7 +233,7 @@ export default async function MediaPage({
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#15130f] via-[#15130f]/80 to-[#15130f]/40" />
           </div>
-          <div className="relative mx-auto max-w-3xl px-8 pb-6 pt-6">
+          <div className="relative mx-auto max-w-3xl px-4 sm:px-8 pb-6 pt-6">
             <Link
               href={SEARCH_PATH[media.media_type] ?? "/"}
               className="text-sm text-white/60 hover:text-white"
@@ -247,7 +247,7 @@ export default async function MediaPage({
           </div>
         </div>
       ) : (
-        <div className="mx-auto max-w-3xl px-8 pt-6">
+        <div className="mx-auto max-w-3xl px-4 sm:px-8 pt-6">
           <Link
             href={SEARCH_PATH[media.media_type] ?? "/"}
             className="text-sm text-white/50 hover:text-white/80"
@@ -261,7 +261,7 @@ export default async function MediaPage({
         </div>
       )}
 
-      <div className="mx-auto max-w-3xl px-8 pb-12">
+      <div className="mx-auto max-w-3xl px-4 sm:px-8 pb-12">
         {genres.length > 0 && (
           <div className="mt-6 flex flex-wrap gap-2">
             {genres.map((g) => (

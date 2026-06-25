@@ -110,7 +110,7 @@ export default async function Home() {
         {/* Hero content */}
         <div className="relative z-10 px-6 pt-12 text-center">
           <h1
-            className="text-6xl font-extrabold tracking-tight sm:text-7xl"
+            className="text-5xl font-extrabold tracking-tight sm:text-6xl md:text-7xl"
             style={{ color: ACCENT, textShadow: "0 0 45px rgba(247,162,59,0.55)" }}
           >
             Bookshelf

@@ -31,7 +31,7 @@ export default async function ListsPage({
   const lists = (data ?? []) as ListRow[];
 
   return (
-    <main className="min-h-screen bg-[#15130f] text-[#f5f3ee] p-8">
+    <main className="min-h-screen bg-[#15130f] text-[#f5f3ee] px-4 py-8 sm:p-8">
       <div className="mx-auto max-w-2xl">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">My lists</h1>
