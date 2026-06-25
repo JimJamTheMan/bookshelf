@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { searchTv, type ScreenResult } from "@/lib/tmdb";
 import { openMedia, startLog } from "../media-actions";
+import { SearchTabs } from "../_components/SearchTabs";
 
 const TV_COLOR = "#4F7ED9"; // the fixed accent colour for TV
 
@@ -50,6 +51,8 @@ export default async function TvPage({
             Search
           </button>
         </form>
+
+        <SearchTabs active="tv" q={query} />
 
         {error && (
           <p className="mt-6 rounded bg-[#D94F4F]/15 border border-[#D94F4F]/30 p-3 text-sm text-[#eaa]">

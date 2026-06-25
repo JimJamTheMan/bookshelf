@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { searchArt, type ArtResult } from "@/lib/wikimedia";
 import { openMedia, startLog } from "../media-actions";
+import { SearchTabs } from "../_components/SearchTabs";
 import { Cover } from "../_components/Cover";
 
 const ART_COLOR = "#BFA34F"; // accent colour for art
@@ -46,6 +47,8 @@ export default async function ArtPage({
             Search
           </button>
         </form>
+
+        <SearchTabs active="art" q={query} />
 
         {error && (
           <p className="mt-6 rounded bg-[#D94F4F]/15 border border-[#D94F4F]/30 p-3 text-sm text-[#eaa]">

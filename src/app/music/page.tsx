@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { searchMusic, type MusicResult } from "@/lib/musicbrainz";
 import { openMedia, startLog } from "../media-actions";
+import { SearchTabs } from "../_components/SearchTabs";
 import { Cover } from "../_components/Cover";
 
 const MUSIC_COLOR = "#D94FB8"; // the fixed accent colour for music
@@ -48,6 +49,8 @@ export default async function MusicPage({
             Search
           </button>
         </form>
+
+        <SearchTabs active="music" q={query} />
 
         {error && (
           <p className="mt-6 rounded bg-[#D94F4F]/15 border border-[#D94F4F]/30 p-3 text-sm text-[#eaa]">

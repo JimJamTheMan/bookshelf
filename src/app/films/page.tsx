@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { searchMovies, type ScreenResult } from "@/lib/tmdb";
 import { openMedia, startLog } from "../media-actions";
+import { SearchTabs } from "../_components/SearchTabs";
 
 const FILM_COLOR = "#D94F4F"; // the fixed accent colour for films
 
@@ -48,6 +49,8 @@ export default async function FilmsPage({
             Search
           </button>
         </form>
+
+        <SearchTabs active="films" q={query} />
 
         {error && (
           <p className="mt-6 rounded bg-[#D94F4F]/15 border border-[#D94F4F]/30 p-3 text-sm text-[#eaa]">

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { searchGames, type GameResult } from "@/lib/igdb";
 import { openMedia, startLog } from "../media-actions";
+import { SearchTabs } from "../_components/SearchTabs";
 
 const GAME_COLOR = "#7A4FD9"; // the fixed accent colour for games
 
@@ -50,6 +51,8 @@ export default async function GamesPage({
             Search
           </button>
         </form>
+
+        <SearchTabs active="games" q={query} />
 
         {error && (
           <p className="mt-6 rounded bg-[#D94F4F]/15 border border-[#D94F4F]/30 p-3 text-sm text-[#eaa]">

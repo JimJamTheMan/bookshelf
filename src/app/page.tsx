@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { HomeLibrary, type LibItem } from "./HomeLibrary";
 import { ShelfBg } from "./_components/ShelfBg";
 import { Cover } from "./_components/Cover";
+import { FindNew } from "./_components/FindNew";
 import { statusLabel } from "@/lib/status";
 import { coverAspect } from "@/lib/format";
 
@@ -24,15 +25,6 @@ type CurrentItem = {
   media_type: string;
   status: string;
 };
-
-const ADD = [
-  { href: "/books", label: "Books" },
-  { href: "/films", label: "Films" },
-  { href: "/tv", label: "TV" },
-  { href: "/games", label: "Games" },
-  { href: "/music", label: "Music" },
-  { href: "/art", label: "Art" },
-];
 
 type LogRow = {
   status: string;
@@ -119,14 +111,8 @@ export default async function Home() {
           <p className="mt-3 text-sm tracking-wide text-white/60">
             Your diary for books · music · film · tv · games · art
           </p>
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-white/45">
-            <span className="text-white/30">Add to library:</span>
-            {ADD.map((m) => (
-              <Link key={m.href} href={m.href} className="hover:text-[#d26a2a]">
-                {m.label}
-              </Link>
-            ))}
-          </div>
+          {/* Find new things to add, across any media type */}
+          <FindNew />
 
           {user ? (
             <>

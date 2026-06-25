@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { searchBooks, type BookResult } from "@/lib/openlibrary";
 import { openMedia, startLog } from "../media-actions";
+import { SearchTabs } from "../_components/SearchTabs";
 
 const BOOK_COLOR = "#4FBF7A"; // the fixed accent colour for books
 
@@ -47,6 +48,8 @@ export default async function BooksPage({
             Search
           </button>
         </form>
+
+        <SearchTabs active="books" q={query} />
 
         {error && (
           <p className="mt-6 rounded bg-[#D94F4F]/15 border border-[#D94F4F]/30 p-3 text-sm text-[#eaa]">
