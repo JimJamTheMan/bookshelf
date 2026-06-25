@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { Cover } from "./Cover";
 import { coverAspect } from "@/lib/format";
 import { openMedia, startLog } from "@/app/media-actions";
@@ -62,8 +65,11 @@ function Tile({ h }: { h: SearchHit }) {
   );
 }
 
-// Grouped, type-tagged results from the unified vendor search.
+// Grouped, type-tagged results from the unified vendor search, with a
+// media-type filter.
 export function VendorResults({ hits }: { hits: SearchHit[] }) {
+  const [filter, setFilter] = useState("all");
+
   if (hits.length === 0) {
     return (
       <p className="mt-6 text-sm text-white/50">
@@ -71,11 +77,41 @@ export function VendorResults({ hits }: { hits: SearchHit[] }) {
       </p>
     );
   }
+
+  // Only offer chips for types that actually have results.
+  const present = SECTIONS.map((s) => ({
+    ...s,
+    count: hits.filter((h) => h.mediaType === s.type).length,
+  })).filter((s) => s.count > 0);
+
+  const shown =
+    filter === "all" ? present : present.filter((s) => s.type === filter);
+
+  const chip = (key: string, label: string, active: boolean) => (
+    <button
+      key={key}
+      onClick={() => setFilter(key)}
+      className={
+        active
+          ? "rounded-full px-3 py-1 text-sm font-medium text-[#200f0a]"
+          : "rounded-full border border-white/15 px-3 py-1 text-sm text-white/70 hover:bg-white/5"
+      }
+      style={active ? { background: "#d26a2a" } : undefined}
+    >
+      {label}
+    </button>
+  );
+
   return (
     <>
-      {SECTIONS.map((sec) => {
+      {/* Media-type filter */}
+      <div className="mt-6 flex flex-wrap gap-2">
+        {chip("all", `All (${hits.length})`, filter === "all")}
+        {present.map((s) => chip(s.type, `${s.label} (${s.count})`, filter === s.type))}
+      </div>
+
+      {shown.map((sec) => {
         const items = hits.filter((h) => h.mediaType === sec.type);
-        if (items.length === 0) return null;
         return (
           <section key={sec.type} className="mt-8">
             <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
