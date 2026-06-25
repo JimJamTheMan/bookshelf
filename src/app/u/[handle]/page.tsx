@@ -147,13 +147,17 @@ export default async function PublicProfilePage({
           {/* Avatar overlaps the banner; everything else sits below it */}
           <div className="-mt-12">
             {profile.avatar_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={profile.avatar_url}
-                alt=""
-                className="h-20 w-20 rounded-full object-cover border-4"
+              <div
+                className="h-20 w-20 overflow-hidden rounded-full border-4"
                 style={{ borderColor: "#200f0a", boxShadow: `0 0 0 2px ${accent}` }}
-              />
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={profile.avatar_url}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              </div>
             ) : (
               <div
                 className="h-20 w-20 rounded-full border-4"

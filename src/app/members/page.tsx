@@ -99,12 +99,14 @@ export default async function MembersPage({
                 >
                   <Link href={`/u/${p.handle}`} className="shrink-0">
                     {p.avatar_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={p.avatar_url}
-                        alt=""
-                        className="h-11 w-11 rounded-full border border-white/15 object-cover"
-                      />
+                      <div className="h-11 w-11 overflow-hidden rounded-full border border-white/15">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={p.avatar_url}
+                          alt=""
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
                     ) : (
                       <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#d26a2a] text-base font-bold text-[#200f0a]">
                         {(p.display_name || p.handle).charAt(0).toUpperCase()}

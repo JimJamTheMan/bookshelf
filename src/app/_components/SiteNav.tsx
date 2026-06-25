@@ -40,13 +40,11 @@ const ACCOUNT = [
 
 function Avatar({ name, url }: { name: string | null; url: string | null }) {
   if (url) {
-    // eslint-disable-next-line @next/next/no-img-element
     return (
-      <img
-        src={url}
-        alt=""
-        className="h-8 w-8 rounded-full border border-white/15 object-cover"
-      />
+      <span className="block h-8 w-8 overflow-hidden rounded-full border border-white/15">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={url} alt="" className="h-full w-full object-cover" />
+      </span>
     );
   }
   const initial = (name ?? "?").trim().charAt(0).toUpperCase() || "?";
