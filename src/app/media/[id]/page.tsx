@@ -7,6 +7,7 @@ import { fetchMediaDetails } from "@/lib/media-details";
 import { openMedia } from "@/app/media-actions";
 import { coverAspect, hiResCover } from "@/lib/format";
 import { ShareButton } from "../../_components/ShareButton";
+import { findSpotifyAlbum } from "@/lib/spotify";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A", film: "#D94F4F", tv: "#4F7ED9",
@@ -74,6 +75,16 @@ export default async function MediaPage({
   const creatorLink = details?.creatorLink ?? null;
   const contributors = details?.contributors ?? [];
   const similar = details?.similar ?? [];
+
+  // Spotify: embed a player for albums (when credentials are configured),
+  // otherwise fall back to a "Listen on Spotify" search link.
+  const spotify =
+    media.media_type === "music"
+      ? await findSpotifyAlbum(media.title, media.creator)
+      : null;
+  const spotifySearchUrl = `https://open.spotify.com/search/${encodeURIComponent(
+    `${media.title} ${media.creator ?? ""}`.trim(),
+  )}`;
 
   const {
     data: { user },
@@ -283,6 +294,32 @@ export default async function MediaPage({
           <p className="mt-6 max-w-prose whitespace-pre-wrap text-sm leading-relaxed text-white/80">
             {description}
           </p>
+        )}
+
+        {media.media_type === "music" && (
+          <section className="mt-6">
+            {spotify ? (
+              <iframe
+                src={`https://open.spotify.com/embed/album/${spotify.id}?theme=0`}
+                width="100%"
+                height="152"
+                style={{ border: 0 }}
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                loading="lazy"
+                title="Spotify player"
+                className="rounded-xl"
+              />
+            ) : (
+              <a
+                href={spotifySearchUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full bg-[#1DB954] px-4 py-2 text-sm font-semibold text-black hover:opacity-90"
+              >
+                ▶ Listen on Spotify
+              </a>
+            )}
+          </section>
         )}
 
         {facts.length > 0 && (
