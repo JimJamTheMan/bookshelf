@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { saveLog } from "./actions";
+import { saveLog, deleteLog } from "./actions";
 import { addToList } from "@/app/lists/actions";
 import { toggleFeatured } from "@/app/profile/actions";
 import { RATING_OPTIONS } from "@/lib/stars";
@@ -215,6 +215,14 @@ export default async function LogPage({
             <button className="self-start rounded bg-[#f5f3ee] px-4 py-2 text-sm font-medium text-[#15130f] hover:bg-white">
               {existing ? "Update log" : "Save to shelf"}
             </button>
+            {existing && (
+              <button
+                formAction={deleteLog}
+                className="self-start rounded border border-[#D94F4F]/50 px-4 py-2 text-sm font-medium text-[#eaa] hover:bg-[#D94F4F]/15"
+              >
+                Remove from shelf
+              </button>
+            )}
           </div>
         </form>
 

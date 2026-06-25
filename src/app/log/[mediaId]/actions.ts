@@ -57,3 +57,32 @@ export async function saveLog(formData: FormData) {
   revalidatePath("/shelf");
   redirect("/shelf?message=" + encodeURIComponent("Saved to your shelf."));
 }
+
+// Remove the logged-in user's log for one media item ("unlog").
+export async function deleteLog(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const media_id = String(formData.get("media_id") ?? "");
+
+  const { error } = await supabase
+    .from("logs")
+    .delete()
+    .eq("user_id", user.id)
+    .eq("media_id", media_id);
+
+  if (error) {
+    redirect(`/log/${media_id}?error=` + encodeURIComponent(error.message));
+  }
+
+  revalidatePath("/shelf");
+  revalidatePath("/");
+  revalidatePath(`/media/${media_id}`);
+  redirect("/shelf?message=" + encodeURIComponent("Removed from your shelf."));
+}
