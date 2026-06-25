@@ -180,8 +180,8 @@ export async function getScreenDetails(
 
   const isTv = mediaType === "tv";
   const append = isTv
-    ? "credits,recommendations,similar"
-    : "credits,release_dates,recommendations,similar";
+    ? "credits,recommendations,similar,videos"
+    : "credits,release_dates,recommendations,similar,videos";
   const url = `https://api.themoviedb.org/3/${isTv ? "tv" : "movie"}/${id}?append_to_response=${append}`;
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
@@ -215,6 +215,14 @@ export async function getScreenDetails(
     };
     recommendations?: { results?: RawWork[] };
     similar?: { results?: RawWork[] };
+    videos?: {
+      results?: {
+        site?: string;
+        type?: string;
+        key?: string;
+        official?: boolean;
+      }[];
+    };
   };
 
   const facts: { label: string; value: string }[] = [];
@@ -281,6 +289,14 @@ export async function getScreenDetails(
     .filter((x) => x.coverUrl)
     .slice(0, 12);
 
+  // Best YouTube trailer: prefer an official Trailer, then any Trailer, then any.
+  const yt = (d.videos?.results ?? []).filter((v) => v.site === "YouTube" && v.key);
+  const trailer =
+    yt.find((v) => v.type === "Trailer" && v.official) ??
+    yt.find((v) => v.type === "Trailer") ??
+    yt.find((v) => v.type === "Teaser") ??
+    yt[0];
+
   return {
     description: d.overview || null,
     facts,
@@ -291,6 +307,7 @@ export async function getScreenDetails(
     crew,
     releases,
     similar,
+    trailerKey: trailer?.key ?? null,
   };
 }
 

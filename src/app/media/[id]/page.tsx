@@ -75,6 +75,7 @@ export default async function MediaPage({
   const creatorLink = details?.creatorLink ?? null;
   const contributors = details?.contributors ?? [];
   const similar = details?.similar ?? [];
+  const trailerKey = details?.trailerKey ?? null;
 
   // Spotify: embed a player for albums (when credentials are configured),
   // otherwise fall back to a "Listen on Spotify" search link.
@@ -83,6 +84,9 @@ export default async function MediaPage({
       ? await findSpotifyAlbum(media.title, media.creator)
       : null;
   const spotifySearchUrl = `https://open.spotify.com/search/${encodeURIComponent(
+    `${media.title} ${media.creator ?? ""}`.trim(),
+  )}`;
+  const youtubeSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(
     `${media.title} ${media.creator ?? ""}`.trim(),
   )}`;
 
@@ -296,9 +300,32 @@ export default async function MediaPage({
           </p>
         )}
 
+        {/* Trailer (films, TV, games) */}
+        {trailerKey &&
+          (media.media_type === "film" ||
+            media.media_type === "tv" ||
+            media.media_type === "game") && (
+            <section className="mt-6">
+              <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
+                Trailer
+              </h2>
+              <div className="mt-3 aspect-video w-full max-w-2xl overflow-hidden rounded-xl">
+                <iframe
+                  src={`https://www.youtube.com/embed/${trailerKey}`}
+                  title="Trailer"
+                  className="h-full w-full"
+                  style={{ border: 0 }}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            </section>
+          )}
+
+        {/* Listen (music): YouTube + Spotify */}
         {media.media_type === "music" && (
           <section className="mt-6">
-            {spotify ? (
+            {spotify && (
               <iframe
                 src={`https://open.spotify.com/embed/album/${spotify.id}?theme=0`}
                 width="100%"
@@ -309,16 +336,27 @@ export default async function MediaPage({
                 title="Spotify player"
                 className="rounded-xl"
               />
-            ) : (
+            )}
+            <div className="mt-3 flex flex-wrap gap-3">
               <a
-                href={spotifySearchUrl}
+                href={youtubeSearchUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full bg-[#1DB954] px-4 py-2 text-sm font-semibold text-black hover:opacity-90"
+                className="inline-flex items-center gap-2 rounded-full bg-[#FF0000] px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
               >
-                ▶ Listen on Spotify
+                ▶ Play on YouTube
               </a>
-            )}
+              {!spotify && (
+                <a
+                  href={spotifySearchUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#1DB954] px-4 py-2 text-sm font-semibold text-black hover:opacity-90"
+                >
+                  Listen on Spotify
+                </a>
+              )}
+            </div>
           </section>
         )}
 

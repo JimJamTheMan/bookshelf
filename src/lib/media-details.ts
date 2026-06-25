@@ -22,6 +22,8 @@ export type MediaDetails = {
   creatorLink?: { source: string; id: string } | null;
   // Credited people to show as links (e.g. all artists on a release).
   contributors?: { id: string | null; name: string; source: string }[];
+  // A YouTube video id for a trailer (films/TV/games), to embed.
+  trailerKey?: string | null;
   // "Similar" items (cache-on-click tiles, like search results).
   similar?: {
     mediaType: string;

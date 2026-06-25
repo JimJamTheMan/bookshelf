@@ -97,7 +97,7 @@ export async function getGameDetails(id: string): Promise<MediaDetails | null> {
   const token = await getToken();
   const clientId = process.env.TWITCH_CLIENT_ID!;
 
-  const body = `fields name, summary, storyline, genres.name, platforms.name, total_rating, involved_companies.company.name, involved_companies.developer; where id = ${Number(id)};`;
+  const body = `fields name, summary, storyline, genres.name, platforms.name, total_rating, involved_companies.company.name, involved_companies.developer, videos.video_id; where id = ${Number(id)};`;
   const res = await fetch("https://api.igdb.com/v4/games", {
     method: "POST",
     headers: {
@@ -116,6 +116,7 @@ export async function getGameDetails(id: string): Promise<MediaDetails | null> {
     platforms?: { name: string }[];
     total_rating?: number;
     involved_companies?: { developer?: boolean; company?: { name: string } }[];
+    videos?: { video_id?: string }[];
   }>;
   const g = arr[0];
   if (!g) return null;
@@ -130,5 +131,7 @@ export async function getGameDetails(id: string): Promise<MediaDetails | null> {
   if (g.total_rating)
     facts.push({ label: "IGDB score", value: `${Math.round(g.total_rating)}/100` });
 
-  return { description: g.summary || g.storyline || null, facts };
+  const trailerKey = (g.videos ?? []).find((v) => v.video_id)?.video_id ?? null;
+
+  return { description: g.summary || g.storyline || null, facts, trailerKey };
 }
