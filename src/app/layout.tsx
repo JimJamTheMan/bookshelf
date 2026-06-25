@@ -31,13 +31,26 @@ export default async function RootLayout({
   } = await supabase.auth.getUser();
 
   let unread = 0;
+  let handle: string | null = null;
+  let name: string | null = null;
+  let avatarUrl: string | null = null;
   if (user) {
-    const { count } = await supabase
-      .from("notifications")
-      .select("id", { count: "exact", head: true })
-      .eq("recipient_id", user.id)
-      .eq("is_read", false);
+    const [{ count }, { data: profile }] = await Promise.all([
+      supabase
+        .from("notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("recipient_id", user.id)
+        .eq("is_read", false),
+      supabase
+        .from("profiles")
+        .select("handle, display_name, avatar_url")
+        .eq("id", user.id)
+        .maybeSingle(),
+    ]);
     unread = count ?? 0;
+    handle = profile?.handle ?? null;
+    name = profile?.display_name ?? null;
+    avatarUrl = profile?.avatar_url ?? null;
   }
 
   return (
@@ -46,7 +59,13 @@ export default async function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <SiteNav signedIn={!!user} unread={unread} />
+        <SiteNav
+          signedIn={!!user}
+          unread={unread}
+          handle={handle}
+          name={name}
+          avatarUrl={avatarUrl}
+        />
         <div className="flex-1">{children}</div>
       </body>
     </html>
