@@ -8,11 +8,15 @@ import { logout } from "@/app/login/actions";
 const PRIMARY = [
   { href: "/feed", label: "Activity" },
   { href: "/discover", label: "Discover" },
+  { href: "/members", label: "Members" },
   { href: "/lists", label: "Lists" },
 ];
 
 // What signed-out visitors can browse.
-const PUBLIC = [{ href: "/discover", label: "Discover" }];
+const PUBLIC = [
+  { href: "/discover", label: "Discover" },
+  { href: "/members", label: "Members" },
+];
 
 // "+ Log" menu — start logging a given medium.
 const ADD = [

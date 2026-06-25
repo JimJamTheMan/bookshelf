@@ -6,6 +6,7 @@ import { starsFromRating } from "@/lib/stars";
 import { fetchMediaDetails } from "@/lib/media-details";
 import { openMedia } from "@/app/media-actions";
 import { coverAspect, hiResCover } from "@/lib/format";
+import { ShareButton } from "../../_components/ShareButton";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A", film: "#D94F4F", tv: "#4F7ED9",
@@ -202,7 +203,10 @@ export default async function MediaPage({
           {media.log_count ?? 0} log{(media.log_count ?? 0) === 1 ? "" : "s"}
         </span>
       </div>
-      <div className="mt-4">{logBtn}</div>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {logBtn}
+        <ShareButton title={media.title} />
+      </div>
     </div>
   );
 

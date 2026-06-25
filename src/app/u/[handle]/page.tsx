@@ -6,6 +6,7 @@ import { starsFromRating } from "@/lib/stars";
 import { statusLabel } from "@/lib/status";
 import { coverAspect, displayTitle } from "@/lib/format";
 import { follow, unfollow } from "./actions";
+import { ShareButton } from "../../_components/ShareButton";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A", film: "#D94F4F", tv: "#4F7ED9",
@@ -169,29 +170,35 @@ export default async function PublicProfilePage({
               <p className="text-sm text-white/50">@{profile.handle}</p>
             </div>
 
-            {user && !isSelf && (
-              <form action={isFollowing ? unfollow : follow} className="shrink-0">
-                <input type="hidden" name="followee_id" value={profile.id} />
-                <input type="hidden" name="handle" value={profile.handle} />
-                <button
-                  className={
-                    isFollowing
-                      ? "rounded border border-white/20 px-4 py-2 text-sm font-medium hover:bg-white/5"
-                      : "rounded bg-[#e8c58f] px-4 py-2 text-sm font-medium text-[#200f0a] hover:bg-white"
-                  }
+            <div className="flex shrink-0 items-center gap-2">
+              {user && !isSelf && (
+                <form action={isFollowing ? unfollow : follow}>
+                  <input type="hidden" name="followee_id" value={profile.id} />
+                  <input type="hidden" name="handle" value={profile.handle} />
+                  <button
+                    className={
+                      isFollowing
+                        ? "rounded border border-white/20 px-4 py-2 text-sm font-medium hover:bg-white/5"
+                        : "rounded bg-[#e8c58f] px-4 py-2 text-sm font-medium text-[#200f0a] hover:bg-white"
+                    }
+                  >
+                    {isFollowing ? "Following" : "Follow"}
+                  </button>
+                </form>
+              )}
+              {isSelf && (
+                <Link
+                  href="/profile"
+                  className="rounded border border-white/20 px-4 py-2 text-sm font-medium hover:bg-white/5"
                 >
-                  {isFollowing ? "Following" : "Follow"}
-                </button>
-              </form>
-            )}
-            {isSelf && (
-              <Link
-                href="/profile"
-                className="shrink-0 rounded border border-white/20 px-4 py-2 text-sm font-medium hover:bg-white/5"
-              >
-                Edit profile
-              </Link>
-            )}
+                  Edit profile
+                </Link>
+              )}
+              <ShareButton
+                label="Share"
+                title={profile.display_name || profile.handle}
+              />
+            </div>
           </div>
 
         {profile.bio && (
