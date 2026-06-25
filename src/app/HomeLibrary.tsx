@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Cover } from "./_components/Cover";
 import { starsFromRating } from "@/lib/stars";
+import { coverAspect } from "@/lib/format";
 
 const ACCENT = "#F7A23B";
 
@@ -122,7 +123,7 @@ export function HomeLibrary({ items }: { items: LibItem[] }) {
                   <Link href={`/media/${it.id}`}>
                     <div className="tile flex overflow-hidden rounded border border-white/10">
                       <div className="w-1 shrink-0" style={{ background: color }} />
-                      <div className="aspect-square flex-1 bg-black/30">
+                      <div className={`${coverAspect(it.media_type)} flex-1 bg-black/30`}>
                         <Cover src={it.cover_url} title={it.title} color={color} />
                       </div>
                     </div>

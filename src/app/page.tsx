@@ -4,6 +4,7 @@ import { HomeLibrary, type LibItem } from "./HomeLibrary";
 import { ShelfBg } from "./_components/ShelfBg";
 import { Cover } from "./_components/Cover";
 import { statusLabel } from "@/lib/status";
+import { coverAspect } from "@/lib/format";
 
 const ACCENT = "#F7A23B";
 
@@ -174,7 +175,7 @@ export default async function Home() {
                                 className="w-1 shrink-0"
                                 style={{ background: color }}
                               />
-                              <div className="aspect-[2/3] flex-1 bg-black/30">
+                              <div className={`${coverAspect(c.media_type)} flex-1 bg-black/30`}>
                                 <Cover
                                   src={c.cover_url}
                                   title={c.title}
@@ -200,16 +201,24 @@ export default async function Home() {
             </>
           ) : (
             <div className="mx-auto mt-10 max-w-md">
-              <Link
-                href="/login"
-                className="inline-block rounded-lg px-6 py-3 text-sm font-semibold text-[#15130f]"
-                style={{ background: ACCENT }}
-              >
-                Log in or sign up
-              </Link>
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <Link
+                  href="/login"
+                  className="inline-block rounded-lg px-6 py-3 text-sm font-semibold text-[#15130f]"
+                  style={{ background: ACCENT }}
+                >
+                  Log in or sign up
+                </Link>
+                <Link
+                  href="/discover"
+                  className="inline-block rounded-lg border border-white/20 px-6 py-3 text-sm font-semibold text-white/80 hover:bg-white/5"
+                >
+                  Explore without an account
+                </Link>
+              </div>
               <p className="mt-4 text-xs text-white/40">
-                Log everything you read, watch, play and hear — in one
-                colour-coded diary.
+                Browse films, TV, music, books, games and art — sign up to start
+                logging your own.
               </p>
             </div>
           )}

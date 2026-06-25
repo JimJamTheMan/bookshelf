@@ -5,7 +5,7 @@ import { Cover } from "../../_components/Cover";
 import { starsFromRating } from "@/lib/stars";
 import { fetchMediaDetails } from "@/lib/media-details";
 import { openMedia } from "@/app/media-actions";
-import { hiResCover } from "@/lib/format";
+import { coverAspect, hiResCover } from "@/lib/format";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A", film: "#D94F4F", tv: "#4F7ED9",
@@ -209,7 +209,7 @@ export default async function MediaPage({
   const poster = (
     <div className="flex w-32 shrink-0 self-start overflow-hidden rounded border border-white/10">
       <div className="w-1.5 shrink-0" style={{ background: color }} />
-      <div className="aspect-[2/3] flex-1 bg-black/30">
+      <div className={`${coverAspect(media.media_type)} flex-1 bg-black/30`}>
         <Cover src={media.cover_url} title={media.title} color={color} />
       </div>
     </div>
@@ -379,7 +379,7 @@ export default async function MediaPage({
                           className="w-1 shrink-0"
                           style={{ background: color }}
                         />
-                        <div className="aspect-[2/3] flex-1 bg-black/30">
+                        <div className={`${coverAspect(s.mediaType)} flex-1 bg-black/30`}>
                           <Cover
                             src={s.coverUrl}
                             title={s.title}

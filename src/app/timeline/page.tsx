@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Cover } from "../_components/Cover";
 import { starsFromRating } from "@/lib/stars";
+import { coverAspect } from "@/lib/format";
 
 const STATUS_LABEL: Record<string, string> = {
   planned: "Wants to try",
@@ -116,7 +117,7 @@ export default async function TimelinePage() {
                         background: MEDIA_COLOR[row.media.media_type] ?? "#888",
                       }}
                     />
-                    <div className="aspect-[2/3] flex-1 bg-black/30">
+                    <div className={`${coverAspect(row.media.media_type)} flex-1 bg-black/30`}>
                       <Cover
                         src={row.media.cover_url}
                         title={row.media.title}

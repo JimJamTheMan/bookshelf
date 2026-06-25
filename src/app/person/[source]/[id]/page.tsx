@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { Cover } from "../../../_components/Cover";
 import { fetchPerson, type PersonWork } from "@/lib/people";
 import { openMedia } from "@/app/media-actions";
-import { displayTitle } from "@/lib/format";
+import { coverAspect, displayTitle } from "@/lib/format";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A", film: "#D94F4F", tv: "#4F7ED9",
@@ -30,7 +30,7 @@ function WorkTile({ w }: { w: PersonWork }) {
         <button type="submit" className="block w-full text-left">
           <div className="flex overflow-hidden rounded border border-white/10">
             <div className="w-1 shrink-0" style={{ background: color }} />
-            <div className="aspect-[2/3] flex-1 bg-black/30">
+            <div className={`${coverAspect(w.mediaType)} flex-1 bg-black/30`}>
               <Cover src={w.coverUrl} title={w.title} color={color} />
             </div>
           </div>

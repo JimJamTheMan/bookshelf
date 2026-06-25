@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Cover } from "../_components/Cover";
-import { displayTitle } from "@/lib/format";
+import { coverAspect, displayTitle } from "@/lib/format";
 import { openMedia } from "@/app/media-actions";
 import type { TrendingItem } from "@/lib/tmdb";
 
@@ -76,7 +76,7 @@ export function TrendingFeed({ initial }: { initial: TrendingItem[] }) {
                 <button type="submit" className="block w-full text-left">
                   <div className="flex overflow-hidden rounded border border-white/10">
                     <div className="w-1 shrink-0" style={{ background: color }} />
-                    <div className="aspect-[2/3] flex-1 bg-black/30">
+                    <div className={`${coverAspect(m.mediaType)} flex-1 bg-black/30`}>
                       <Cover src={m.coverUrl} title={m.title} color={color} />
                     </div>
                   </div>

@@ -70,7 +70,7 @@ export default async function MusicPage({
                     className="w-1 shrink-0"
                     style={{ background: MUSIC_COLOR }}
                   />
-                  <div className="relative aspect-[2/3] flex-1 bg-black/30">
+                  <div className="relative aspect-square flex-1 bg-black/30">
                     <Cover
                       src={album.coverUrl}
                       title={album.title}

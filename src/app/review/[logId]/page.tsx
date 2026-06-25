@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Cover } from "../../_components/Cover";
 import { toggleLike, addComment } from "./actions";
 import { starsFromRating } from "@/lib/stars";
+import { coverAspect } from "@/lib/format";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A", film: "#D94F4F", tv: "#4F7ED9",
@@ -99,7 +100,7 @@ export default async function ReviewPage({
         <div className="mt-4 flex gap-4 rounded-lg border border-white/10 bg-black/20 p-4">
           <div className="flex w-16 shrink-0 self-start overflow-hidden rounded border border-white/10">
             <div className="w-1 shrink-0" style={{ background: color }} />
-            <div className="aspect-[2/3] flex-1 bg-black/30">
+            <div className={`${coverAspect(media.media_type)} flex-1 bg-black/30`}>
               <Cover src={media.cover_url} title={media.title} color={color} />
             </div>
           </div>

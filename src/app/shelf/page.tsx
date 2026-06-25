@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { starsFromRating } from "@/lib/stars";
 import { statusLabel } from "@/lib/status";
-import { displayTitle, hiResCover } from "@/lib/format";
+import { coverAspect, displayTitle, hiResCover } from "@/lib/format";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A",
@@ -132,7 +132,7 @@ export default async function ShelfPage({
                             MEDIA_COLOR[row.media.media_type] ?? "#888",
                         }}
                       />
-                      <div className="relative aspect-[2/3] flex-1 bg-black/30">
+                      <div className={`relative ${coverAspect(row.media.media_type)} flex-1 bg-black/30`}>
                         {row.media.cover_url ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img

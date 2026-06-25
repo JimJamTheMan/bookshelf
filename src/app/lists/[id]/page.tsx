@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Cover } from "../../_components/Cover";
 import { deleteList, removeFromList } from "../actions";
+import { coverAspect } from "@/lib/format";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A", film: "#D94F4F", tv: "#4F7ED9",
@@ -100,7 +101,7 @@ export default async function ListDetailPage({
                           background: MEDIA_COLOR[it.media.media_type] ?? "#888",
                         }}
                       />
-                      <div className="aspect-[2/3] flex-1 bg-black/30">
+                      <div className={`${coverAspect(it.media.media_type)} flex-1 bg-black/30`}>
                         <Cover
                           src={it.media.cover_url}
                           title={it.media.title}

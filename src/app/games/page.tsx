@@ -72,7 +72,7 @@ export default async function GamesPage({
                     className="w-1 shrink-0"
                     style={{ background: GAME_COLOR }}
                   />
-                  <div className="relative aspect-[2/3] flex-1 bg-black/30">
+                  <div className="relative aspect-[3/4] flex-1 bg-black/30">
                     {game.coverUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img

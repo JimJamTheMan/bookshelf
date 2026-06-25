@@ -68,7 +68,7 @@ export default async function ArtPage({
                     className="w-1 shrink-0"
                     style={{ background: ART_COLOR }}
                   />
-                  <div className="relative aspect-[2/3] flex-1 bg-black/30">
+                  <div className="relative aspect-square flex-1 bg-black/30">
                     <Cover
                       src={art.coverUrl}
                       title={art.title}

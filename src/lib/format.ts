@@ -1,3 +1,17 @@
+// Each format has its own natural cover shape: albums/artworks are square,
+// game box art is a little taller, books/films/TV are tall posters.
+export function coverAspect(mediaType: string): string {
+  switch (mediaType) {
+    case "music":
+    case "art":
+      return "aspect-square";
+    case "game":
+      return "aspect-[3/4]";
+    default:
+      return "aspect-[2/3]"; // book, film, tv
+  }
+}
+
 // Upgrade a cover URL to a higher resolution at display time, so even covers
 // that were cached at a smaller size render sharply.
 export function hiResCover(

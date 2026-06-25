@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Cover } from "../_components/Cover";
-import { displayTitle } from "@/lib/format";
+import { coverAspect, displayTitle } from "@/lib/format";
 import { getRecommendations } from "@/lib/recommendations";
 
 const MEDIA_COLOR: Record<string, string> = {
@@ -27,7 +27,7 @@ function Grid({ items }: { items: Media[] }) {
           <Link href={`/media/${m.id}`}>
             <div className="flex overflow-hidden rounded border border-white/10">
               <div className="w-1 shrink-0" style={{ background: MEDIA_COLOR[m.media_type] ?? "#888" }} />
-              <div className="aspect-[2/3] flex-1 bg-black/30">
+              <div className={`${coverAspect(m.media_type)} flex-1 bg-black/30`}>
                 <Cover src={m.cover_url} title={m.title} color={MEDIA_COLOR[m.media_type] ?? "#888"} />
               </div>
             </div>

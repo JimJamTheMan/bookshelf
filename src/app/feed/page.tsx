@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Cover } from "../_components/Cover";
 import { starsFromRating } from "@/lib/stars";
-import { displayTitle } from "@/lib/format";
+import { coverAspect, displayTitle } from "@/lib/format";
 
 const STATUS_VERB: Record<string, Record<string, string>> = {
   book: { planned: "wants to read", in_progress: "is reading", completed: "read", on_hold: "paused", dropped: "dropped" },
@@ -121,7 +121,7 @@ export default async function FeedPage() {
                     className="flex w-14 shrink-0 self-start overflow-hidden rounded border border-white/10"
                   >
                     <div className="w-1 shrink-0" style={{ background: color }} />
-                    <div className="aspect-[2/3] flex-1 bg-black/30">
+                    <div className={`${coverAspect(row.media.media_type)} flex-1 bg-black/30`}>
                       <Cover
                         src={row.media.cover_url}
                         title={row.media.title}

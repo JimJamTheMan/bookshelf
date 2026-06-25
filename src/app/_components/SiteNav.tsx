@@ -11,6 +11,9 @@ const PRIMARY = [
   { href: "/lists", label: "Lists" },
 ];
 
+// What signed-out visitors can browse.
+const PUBLIC = [{ href: "/discover", label: "Discover" }];
+
 // "+ Log" menu — start logging a given medium.
 const ADD = [
   { href: "/books", label: "Book" },
@@ -111,11 +114,9 @@ export function SiteNav({
           Bookshelf
         </Link>
 
-        {signedIn && (
-          <nav className="hidden items-center gap-1 md:flex">
-            {PRIMARY.map((l) => navLink(l.href, l.label))}
-          </nav>
-        )}
+        <nav className="hidden items-center gap-1 md:flex">
+          {(signedIn ? PRIMARY : PUBLIC).map((l) => navLink(l.href, l.label))}
+        </nav>
 
         <div className="ml-auto flex items-center gap-2">
           {/* Persistent search → Discover */}

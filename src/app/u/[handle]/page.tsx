@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Cover } from "../../_components/Cover";
 import { starsFromRating } from "@/lib/stars";
 import { statusLabel } from "@/lib/status";
-import { displayTitle } from "@/lib/format";
+import { coverAspect, displayTitle } from "@/lib/format";
 import { follow, unfollow } from "./actions";
 
 const MEDIA_COLOR: Record<string, string> = {
@@ -229,7 +229,7 @@ export default async function PublicProfilePage({
                               MEDIA_COLOR[row.media.media_type] ?? "#888",
                           }}
                         />
-                        <div className="aspect-[2/3] flex-1 bg-black/30">
+                        <div className={`${coverAspect(row.media.media_type)} flex-1 bg-black/30`}>
                           <Cover
                             src={row.media.cover_url}
                             title={row.media.title}
@@ -270,7 +270,7 @@ export default async function PublicProfilePage({
                         className="w-1 shrink-0"
                         style={{ background: MEDIA_COLOR[m.media_type] ?? "#888" }}
                       />
-                      <div className="aspect-[2/3] flex-1 bg-black/30">
+                      <div className={`${coverAspect(m.media_type)} flex-1 bg-black/30`}>
                         <Cover
                           src={m.cover_url}
                           title={m.title}
