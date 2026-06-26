@@ -10,6 +10,7 @@ import { ShareButton } from "../../_components/ShareButton";
 import { findSpotifyAlbum } from "@/lib/spotify";
 import { TrailerEmbed } from "../../_components/TrailerEmbed";
 import { pickEmbeddableYouTube } from "@/lib/youtube";
+import { Bio } from "../../_components/Bio";
 import { BackButton } from "@/app/_components/BackButton";
 
 const MEDIA_COLOR: Record<string, string> = {
@@ -286,11 +287,7 @@ export default async function MediaPage({
           </div>
         )}
 
-        {description && (
-          <p className="mt-6 max-w-prose whitespace-pre-wrap text-sm leading-relaxed text-white/80">
-            {description}
-          </p>
-        )}
+        {description && <Bio text={description} />}
 
         {/* Trailer (films, TV, games) */}
         {trailerKeys.length > 0 &&

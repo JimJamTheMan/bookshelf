@@ -5,6 +5,7 @@ import { fetchPerson, type PersonWork } from "@/lib/people";
 import { openMedia } from "@/app/media-actions";
 import { coverAspect, displayTitle } from "@/lib/format";
 import { BackButton } from "@/app/_components/BackButton";
+import { Bio } from "@/app/_components/Bio";
 
 const MEDIA_COLOR: Record<string, string> = {
   book: "#4FBF7A", film: "#D94F4F", tv: "#4F7ED9",
@@ -84,11 +85,7 @@ export default async function PersonPage({
           </div>
         </div>
 
-        {person.bio && (
-          <p className="mt-5 max-w-prose whitespace-pre-wrap text-sm leading-relaxed text-white/75 line-clamp-6">
-            {person.bio}
-          </p>
-        )}
+        {person.bio && <Bio text={person.bio} />}
 
         {person.related && person.related.length > 0 && (
           <section className="mt-6">
