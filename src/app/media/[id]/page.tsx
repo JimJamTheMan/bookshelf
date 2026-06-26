@@ -428,7 +428,13 @@ export default async function MediaPage({
         {similar.length > 0 && (
           <section className="mt-8">
             <h2 className="text-sm font-medium uppercase tracking-wide text-white/40">
-              {media.media_type === "tv" ? "Similar shows" : "Similar films"}
+              {media.media_type === "tv"
+                ? "Similar shows"
+                : media.media_type === "book"
+                  ? "More by this author"
+                  : media.media_type === "game"
+                    ? "Similar games"
+                    : "Similar films"}
             </h2>
             <ul className="mt-3 grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-6">
               {similar.map((s) => (

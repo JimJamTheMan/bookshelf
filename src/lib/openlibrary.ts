@@ -126,10 +126,28 @@ export async function getBookDetails(
   const authorKey = d.authors?.[0]?.author?.key; // "/authors/OL..A"
   const authorId = authorKey ? authorKey.replace("/authors/", "") : null;
 
+  // Suggestions: other books by the same author.
+  let similar: MediaDetails["similar"] = [];
+  if (authorId) {
+    const author = await getOpenLibraryAuthor(authorId);
+    similar = (author?.works ?? [])
+      .filter((w) => w.sourceId !== workId)
+      .map((w) => ({
+        mediaType: "book",
+        source: "open_library",
+        sourceId: w.sourceId,
+        title: w.title,
+        year: w.year,
+        coverUrl: w.coverUrl,
+      }))
+      .slice(0, 12);
+  }
+
   return {
     description,
     facts,
     creatorLink: authorId ? { source: "open_library", id: authorId } : null,
+    similar,
   };
 }
 
