@@ -92,10 +92,18 @@ export async function fetchPerson(
         ids.openLibraryAuthor = cross.openLibraryAuthor;
     }
 
-    // If Wikidata had no Open Library link, try matching an author by name.
-    if (!ids.openLibraryAuthor && source !== "open_library") {
-      ids.openLibraryAuthor =
-        (await findOpenLibraryAuthorId(base.name)) ?? undefined;
+    // If Wikidata had no Open Library link, we can try matching an author by
+    // name — but ONLY if that author links back to the SAME Wikidata id.
+    // A bare name match would otherwise pull in books by a different person who
+    // happens to share the name (e.g. an actor vs. an unrelated author).
+    if (!ids.openLibraryAuthor && source !== "open_library" && qid) {
+      const candidate = await findOpenLibraryAuthorId(base.name);
+      if (candidate) {
+        const candidateQid = await getOpenLibraryWikidataId(candidate);
+        if (candidateQid && candidateQid === qid) {
+          ids.openLibraryAuthor = candidate;
+        }
+      }
     }
 
     // 3. Fetch works from the *other* sources in parallel.
