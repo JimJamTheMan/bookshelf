@@ -21,11 +21,6 @@ const MEDIA_LABEL: Record<string, string> = {
   book: "Book", film: "Film", tv: "TV", music: "Music", game: "Game", art: "Art",
 };
 
-const SEARCH_PATH: Record<string, string> = {
-  book: "/books", film: "/films", tv: "/tv",
-  music: "/music", game: "/games", art: "/art",
-};
-
 const REGION_NAMES: Record<string, string> = {
   US: "USA", GB: "UK", FR: "France", DE: "Germany", IT: "Italy",
   ES: "Spain", JP: "Japan", CA: "Canada", AU: "Australia", IE: "Ireland",

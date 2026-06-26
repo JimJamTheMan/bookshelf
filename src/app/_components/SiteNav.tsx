@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { logout } from "@/app/login/actions";
 import { NavSearch } from "./NavSearch";
 
@@ -72,13 +72,16 @@ export function SiteNav({
   const [mobile, setMobile] = useState(false);
   const [logMenu, setLogMenu] = useState(false);
   const [acct, setAcct] = useState(false);
+  const [lastPath, setLastPath] = useState(pathname);
 
-  // Close every menu whenever the route changes.
-  useEffect(() => {
+  // Close every menu when the route changes (reset during render — React's
+  // recommended alternative to calling setState inside an effect).
+  if (pathname !== lastPath) {
+    setLastPath(pathname);
     setMobile(false);
     setLogMenu(false);
     setAcct(false);
-  }, [pathname]);
+  }
 
   if (["/login", "/signup", "/forgot-password"].includes(pathname)) return null;
 

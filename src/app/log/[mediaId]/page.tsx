@@ -29,15 +29,6 @@ const MEDIA_COLOR: Record<string, string> = {
   art: "#BFA34F",
 };
 
-const SEARCH_PATH: Record<string, string> = {
-  book: "/books",
-  film: "/films",
-  tv: "/tv",
-  music: "/music",
-  game: "/games",
-  art: "/art",
-};
-
 function statusOptions(mediaType: string) {
   const v = VERBS[mediaType] ?? VERBS.book;
   return [
